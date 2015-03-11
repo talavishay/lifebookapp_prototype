@@ -1,0 +1,17 @@
+name = Project
+description = project organization.
+;package =
+core = 7.x
+
+dependencies[] = entity
+dependencies[] = views
+
+; Entity classes.
+files[] = includes/project.controller.inc
+files[] = includes/project.ui_controller.inc
+files[] = includes/project.entity.inc
+files[] = includes/project.info.inc
+
+; Views integration and handlers.
+files[] = views/project.views.inc
+files[] = views/handlers/project_handler_field_operations.inc

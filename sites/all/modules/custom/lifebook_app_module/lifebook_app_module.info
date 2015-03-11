@@ -1,0 +1,4 @@
+name = lifebook app module
+core = 7.x
+
+files[] = lifebook_app_module.pages.inc

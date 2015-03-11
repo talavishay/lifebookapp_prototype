@@ -1,0 +1,400 @@
+<?php
+/**
+ * Implements hook_field_info().
+ *
+ * Provides the description of the field.
+ */
+function fabric_canvas_view_field_field_info() {
+  return array(
+    // We name our field as the associative name of the array.
+    'json' => array(
+      'label' => t('fabric canvas view'),
+      'description' => t(''),
+      'default_widget' => 'fabric_canvas_view_field_default_widget',
+      'default_formatter' => 'fabric_canvas_view_field_default_formatter',
+    ),
+  );
+}
+
+function fabric_canvas_view_field_field_formatter_info() {
+  return array(
+    'fabric_canvas_view_field_default_formatter' => array(
+		'label' => t('fabric.js - dynamic canvas'),
+		'field types' => array('json'),
+		'settings' => array(
+			'width' => '595', 
+			'height' => '842',
+			'scale' => '1'
+			),
+		),
+  );
+}
+
+/**
+ * Implements hook_field_widget_info().
+ *
+ * These widget types will eventually show up in hook_field_widget_form,
+ * where we will have to flesh them out.
+ *
+ */
+function fabric_canvas_view_field_field_widget_info() {
+  return array(
+    'fabric_canvas_view_field_default_widget' => array(
+      	'label' => t('raw json'),
+      	'field types' => array('json'),
+    	'settings' => array(
+    		'width' => '595',
+    		'height' => '842',
+    		'scale' => '1'
+    	),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function fabric_canvas_view_field_field_formatter_settings_summary($field, $instance, $view_mode) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+  //return implode('<br />', $display['settings']);
+  return json_encode($display['settings']);
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function fabric_canvas_view_field_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+
+ 
+  //$element['image_style'] = array(
+    //'#title' => t('Image style'),
+    //'#type' => 'select',
+    //'#default_value' => $settings['image_style'],
+    //'#empty_option' => t('None (original image)'),
+    //'#options' => array(1,2,3);//$image_styles,
+  //);
+  
+$element['width'] = array(
+   '#type' => 'textfield',
+    '#title' => t('width'),
+    '#default_value' => FALSE,
+  );
+$element['height'] = array(
+   '#type' => 'textfield',
+    '#title' => t('height'),
+    '#default_value' => FALSE,
+  );
+$element['scale'] = array(
+   '#type' => 'textfield',
+    '#title' => t('scale'),
+    '#default_value' => FALSE,
+  );
+  return $element;
+}
+
+function _callback_canvas_fieldset_wrap($form, $form_state) {
+	//select and return the portion of the form that is to be replaced on the original page.
+	$form["field_canvas"]['#prefix'] = '<div id="canvas_fieldset_wrap">'.rand(0,100);
+	$form["field_canvas"]['#suffix'] = '</div>';
+		
+	return $form["field_canvas"];
+}
+function _callback_2($form, $form_state) {
+  return array(
+   '#type' => 'button',
+    '#title' => t('width'),
+    '#default_value' => FALSE,
+    '#value' => "xxxx_".rand(0, 10),
+    '#prefix' => '<div id="canvas_json_wrap2">',
+		'#suffix' => '</div>',
+  );
+}
+
+/**
+ * Implements hook_field_widget_form().
+ *
+ * hook_widget_form() is where Drupal tells us to create form elements for
+ * our field's widget.
+ */
+function fabric_canvas_view_field_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+	//dpm();
+	if( $field["type"] === "json"){
+		$value = isset($items[$delta]['json']) ? $items[$delta]['json'] : '';
+		$item = array("json" => $value);
+		$entity_id = isset($element['#entity']->vid) ? $element['#entity']->vid : 0;
+		if(isset($element['#entity']->id)){
+			$entity_id = $element['#entity']->id;
+		}
+		//$format = $instance['display'][$view_mode];
+		//$settings = $format['settings'];
+		
+		$display = $instance["display"]["default"];
+		//$entity = $form_state["build_info"]["args"][0]; 
+		$entity = $element["#entity"]; 
+		$main_widget = array();
+		
+		//switch($instance['widget']['type']){
+		//case 'fabric_canvas_view_field_default_widget':
+		//$type = $format['type'];
+		//$element = array();
+		//$empty_canvas = '{"objects":[],"background":"rgba(0,0,0,0.1)"}';
+		$empty_canvas = '{"objects":[{"type":"i-text","originX":"center","originY":"center","left":110,"top":60,"width":180,"height":52,"fill":"rgb(0,0,0)","stroke":null,"strokeWidth":1,"strokeDashArray":null,"strokeLineCap":"butt","strokeLineJoin":"miter","strokeMiterLimit":10,"scaleX":1,"scaleY":1,"angle":0,"flipX":false,"flipY":false,"opacity":1,"shadow":null,"visible":true,"clipTo":null,"backgroundColor":"","fillRule":"nonzero","globalCompositeOperation":"source-over","text":"hello world","fontSize":40,"fontWeight":"normal","fontFamily":"Times New Roman","fontStyle":"","lineHeight":1.3,"textDecoration":"","textAlign":"right","path":null,"textBackgroundColor":"","useNative":true,"styles":{}}],"background":"rgba(0,0,0,0.1)"}';
+		$main_widget = $element + array(
+			'#default_value' => (isset($item['json']) && $item['json'] != "") ?  $item['json'] : $empty_canvas, 
+			'#type' => 'hidden',
+			"#attributes"=> array(
+				'data-entity_id' => $entity_id ,
+				'data-entity_delta' => $delta,
+				'value' => $value ,
+			),
+		);
+		$element["canvas"] =  _get_fabric_canvas_view_field( $entity, $field, $delta, $value, $display);	
+		$element['json'] = $main_widget;
+		return $element;
+	}
+}
+
+function canvas_file_upload_validate(){
+	echo "validate";
+
+}
+
+function _callback_3(){
+	echo "callback";
+	//die(|):exit();
+
+}
+
+/**
+ * Implements hook_field_validate().
+ *
+ * This hook gives us a chance to validate content that's in our
+ * field. We're really only interested in the $items parameter, since
+ * it holds arrays representing content in the field we've defined.
+ * We want to verify that the items only contain canvas_json hex values like
+ * this: #RRGGBB. If the item validates, we do nothing. If it doesn't
+ * validate, we add our own error notification to the $errors parameter.
+ *
+ * @see fabric_canvas_view_field_field_widget_error()
+ */
+function fabric_canvas_view_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors){
+
+}
+
+
+function _value($element, $input = FALSE, $form_state) {
+	if ($input) {
+		// Checkboxes lose their value when empty.
+		// If the display field is present make sure its unchecked value is saved.
+		$field = field_widget_field($element, $form_state);
+		if (empty($input['display'])) {
+			$input['display'] = $field['settings']['display_field'] ? 0 : 1;
+		}
+	}
+}
+/**
+ * Implements hook_field_is_empty().
+ *
+ * hook_field_is_emtpy() is where Drupal asks us if this field is empty.
+ * Return TRUE if it does not contain data, FALSE if it does. This lets
+ * the form API flag an error when required fields are empty.
+ */
+function fabric_canvas_view_field_field_is_empty($item, $field) {
+  return  empty($item['json'] );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ *
+ * @see fabric_canvas_view_field_field_formatter_info()
+ */
+function fabric_canvas_view_field_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+//dpm($field);
+	$element = array();
+	foreach ($items as $delta => $item) {
+		$element[$delta] = _get_fabric_canvas_view_field( $entity, $field, $delta, $item, $display);
+	}
+	return $element;
+}
+function _get_fabric_canvas_view_field($entity, $field, $delta, $item, $display){
+	
+	if(property_exists($entity, "vid")){
+		$_entity_id = $entity->vid;
+	}
+	if(property_exists($entity, "id")){
+		$_entity_id = $entity->id;
+	}
+	
+	if(gettype($item) === "string"){
+		$_data = $item;
+	} else {
+		$_data = $item["json"];
+	}
+	
+	if( gettype($entity) === "object"){
+	return array(
+		'#type' => 'html_tag',
+		'#tag' => 'canvas',
+		//'#prefix' => '<div id="canvas_json_wrap">',
+		//'#suffix' => '</div>',
+		'#attributes' => array(
+			'class' => 'fabric_canvas_view_field',
+			'id' => 'fabric_canvas_view_field_'.$_entity_id.'_'.$delta,
+			'data-field_name' => $field["field_name"],
+			'data-entity_id' => $_entity_id,
+			'data-entity_delta' => $delta,
+			'data-canvas_width' => $display["settings"]["width"],
+			'data-canvas_height' => $display["settings"]["height"],
+			'data-canvas_scale' => $display["settings"]["scale"],
+		),
+		// '#value' => '<pre>'.print_r($display,true).'</pre>',
+		'#attached' => array(
+			'library' => array(
+				array('system', 'ui.accordion'),
+				array('system', 'ui.dialog'),
+				array('system', 'ui.button'),
+				array('system', 'ui.slider'),
+				array('system', 'effects'),
+			),
+			'css' => array(
+				array(
+						'data' => '
+						.canvas-container.saved{ 
+						transition: all 2s ease-in-out 0s;
+						 box-shadow: 0px 0px 5px 5px rgb(82, 227, 77) !important;}
+						.canvas-container.active{  box-shadow: 0px 0px 17px 0px #F00;}	',
+						'type' => 'inline'),
+			),
+			'js' => array(
+				drupal_get_path('module', 'fabric_canvas_view'). '/js/fabric_canvas_view.js',
+				drupal_get_path('module', 'fabric_canvas_view'). '/js/fabric.js',
+				drupal_get_path('module', 'fabric_canvas_view_field').'/js/fabric_canvas_view_field.js',
+				_get_js_data($_entity_id, $delta, $_data, $display)
+			)
+		)
+	);
+	}
+	
+}
+function _get_js_data($_entity_id , $delta = 0, $value, $display){
+	return array(
+	'data' => array(
+		'canvas_view_field_data' => array(
+			array(
+			//$entity->vid =>	array(
+				//$delta => array(
+					'id'	=> 'fabric_canvas_view_field_'.$_entity_id.'_'.$delta,
+					'delta' => $delta,
+					'entity_vid' => $_entity_id,
+					'json'=> $value,
+					'canvas_profile'	=> array(
+						'id' 	=> $_entity_id,
+						'delta' => $delta,
+						'width' => $display["settings"]["width"],
+						'height'=> $display["settings"]["height"],
+						'scale' => $display["settings"]["scale"]
+					),
+				//)
+			//)
+			)
+		)
+	), 'type' => 'setting');
+}
+/**
+ * Implements hook_menu().
+ *
+ */
+function fabric_canvas_view_field_menu() {
+	$menu = array();
+
+$menu['load_canvas_field_handler/%/%'] = array(
+	'title' => 'load canvas field',
+	'page callback' => 'load_canvas_field_handler',
+	'page arguments' => array(1, 2),
+	'access callback' => 'file_upload_handler_access',
+	'delivery callback' => '_deliver_page',
+	'type' => MENU_CALLBACK,
+	'weight' => 0,
+);
+
+$menu['save_canvas_field_handler/%/%'] = array(
+	'title' => 'save canvas field',
+	'page callback' => 'save_canvas_field_handler',
+	'page arguments' => array(1, 2),
+	'access callback' => 'file_upload_handler_access',
+	'delivery callback' => '_deliver_page',
+	'type' => MENU_CALLBACK,
+	'weight' => 0,
+);
+
+return $menu;
+}
+
+function load_canvas_field_handler($nid, $delta ){
+	$node =  node_load($nid);
+	$canvas_json = $node->field_texttext["und"][0]["canvas_json"];
+	
+	//echo json_encode($node, JSON_PRETTY_PRINT);
+	echo json_encode(json_decode($canvas_json), JSON_PRETTY_PRINT);
+}
+
+function save_canvas_field_handler($nid, $delta, $field_name){
+	$entity =  entity_load_single("project", $_POST["nid"]);
+	$field = $entity->$_POST["field_name"];
+	$field["und"][$delta]["json"] = $_POST["layout_data"];
+	$entity->$_POST["field_name"] =$field;
+	project_save($entity);
+	$entity =  entity_load_single("project", $_POST["nid"]);
+	$x = drupal_load('module', 'lifebook_app_module');;
+	print render(lifebook_app_canvas_preview($entity));
+}
+
+/*
+function fabric_canvas_view_field_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items, $displays){
+	$x=0;
+}
+ *///array(
+//'#type' => 'html_tag',
+//'#tag' => 'canvas',
+	
+//'#attributes' => array(
+//'class' => 'fabric_canvas_view_field',
+//'id' => 'fabric_canvas_view_field_'.$delta,
+
+//'data-entity_id' => $element['#entity']->vid ,
+//'data-entity_delta' => $delta,
+//'data-canvas_width' => 800,
+//'data-canvas_height' => 400,
+//'data-canvas_scale' => 6,
+//),
+//'#value' => '<pre>print_r($display,true)</pre>',
+//'#attached' => array(
+//'library' => array(
+//array('system', 'ui.accordion'),
+//array('system', 'ui.dialog'),
+//array('system', 'ui.button'),
+//array('system', 'ui.slider'),
+//),
+//'css' => array(
+//array(
+//'data' => '.field-type-fabric-canvas-view-field-canvas_json canvas { background-color:#F29B99;}',
+//'type' => 'inline',
+//),
+//),
+//// Add javascript
+//'js' => array(
+//drupal_get_path('module', 'fabric_canvas_view'). '/js/fabric_canvas_view.js',
+//drupal_get_path('module', 'fabric_canvas_view'). '/js/fabric.js',
+//drupal_get_path('module', 'fabric_canvas_view_field').'/js/fabric_canvas_view_field.js'
+//),
+//)
+//);
+////$element['canvas_json'] = $widget;
+
+
+//$element['value'] = array();
+// $element['fabric_canvas_view_field'] = $widget;

@@ -1,0 +1,379 @@
+<?php
+function lifebook_app_module_css_alter(&$css) {
+	$arg = arg();
+	if($arg[0] === "app"){
+		unset($css["modules/system/system.theme.css"]);		
+	}
+	return $css;
+}
+function lifebook_app_module_menu() {
+  $menu = array();
+  $menu['testt'] = array(
+    //'title' => 'app',
+    'page callback' => "test_callback",
+    'access callback' => 'lifebook_app_page_access',
+  	'file' => 'lifebook_app_module.pages.inc',
+  );
+  $menu['app/%/%'] = array(
+    //'title' => 'app',
+    'page callback' => 'lifebook_app_callback',
+    'access callback' => 'lifebook_app_page_access',
+    'file' => 'lifebook_app_module.pages.inc',
+    'page arguments' => array(1,2),
+    //'type' => MENU_CALLBACK,
+    'weight' => 0,
+	'title' => '<none>',
+  );
+   $menu["_update_student/%/%"] = array(
+    //'title' => 'app',
+    'page callback' => 'lifebook_app_update_student',
+    'access callback' => 'lifebook_app_page_access',
+    'file' => 'lifebook_app_module.pages.inc',
+    'page arguments' => array(1,2),
+    //'type' => MENU_CALLBACK,
+    'weight' => 0,
+	'title' => '<none>',
+  ); 
+  $menu['appx/%'] = array(
+  		'page callback' => 'lifebook_app_callback_ajax',
+  		'delivery callback' => 'ajax_deliver',
+  		'page arguments' => array(1),
+  		'access callback' => 'lifebook_app_page_access',
+  		'file' => 'lifebook_app_module.pages.inc',
+  		'type' => MENU_CALLBACK,
+  		'weight' => 0,
+  );
+  return $menu;
+}
+function lifebook_app_page_access() {
+  return TRUE;
+}
+function lifebook_app_module_theme(){
+	return array(
+    'stage' => array(
+    	'template' => 'stage',
+    	'variables' => array(
+    			'active_page' => NULL
+    	),
+    	'file' => 'lifebook_app_module.theme.inc'
+	),
+    'lifebook_class_preview' => array(
+    	'render element' => 'element',
+    	'file' => 'lifebook_app_module.theme.inc'
+	),
+	'lifebook_header' => array(
+		'template' => 'header',
+		'variables' => array(
+				'user_name' => 'Nameless user',
+				'school_name' => 'Nameless school',
+				'class_name' => 'Nameless class',
+				'due_date' => '01.01.1983',
+		),
+		'file' => 'lifebook_app_module.theme.inc'
+	),
+	'lifebook_sidebar_first' => array(
+		'template' => 'sidebar_first',
+		'variables' => array(
+				'user_name' => 'Nameless user',
+				
+		),
+		'file' => 'lifebook_app_module.theme.inc'
+	),
+	'lifebook_sidebar_second' => array(
+		'template' => 'sidebar_second',
+		'variables' => array(
+				'user_name' => 'Nameless user',
+				
+		),
+		'file' => 'lifebook_app_module.theme.inc'
+	),
+	'select_class' => array(
+		//'template' => 'select_class',
+		'render element' => 'element',
+		'variables' => array(
+				'list' => array(t('Option 1'),t('Option 2') )
+		),
+		'file' => 'lifebook_app_module.theme.inc'
+			
+	),
+	'file_widget_multiple_override' => array(
+		'render element' => 'element',
+		'file' => 'lifebook_app_module.theme.inc'
+	),
+	'image_widget_override' => array(
+		'render element' => 'element',
+		'file' => 'lifebook_app_module.theme.inc'
+	),
+	);
+}
+function lifebook_app_module_block_info() {
+  $blocks = array();
+  $blocks['lifebook_header'] = array(
+    'info' => t('lifebook app info'),
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+  	'pages' => 'app*',
+  	'region' => 'header',
+  		'status' => 1,
+  		'weight' => '-10', // block weight in the region
+  );
+  $blocks['lifebook_app_content'] = array(
+    'info' => t('lifebook app contnet'),
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+  	'pages' => 'app*',
+  	'region' => 'sidebar_first',
+  		'status' => 1,
+  		'weight' => '-10', // block weight in the region
+  );
+  $blocks['lifebook_app_class_preview'] = array(
+    'info' => t('lifebook class preview'),
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+  	'pages' => 'app*',
+  	'region' => 'content',
+  		'status' => 1,
+  		'weight' => '10', // block weight in the region
+  );
+  $blocks['lifebook_app_tools'] = array(
+    'info' => t('lifebook app tools'),
+    'visibility' => BLOCK_VISIBILITY_LISTED,
+  	'pages' => 'app*',
+  	'region' => 'sidebar_second',
+  		'status' => 1,
+  		'weight' => '-10', // block weight in the region
+  );
+  return $blocks;
+}
+function lifebook_app_module_block_view($delta = '') {
+	global $user;	
+	$block = array();
+	if ($user->uid !== 0 ) {
+		switch ($delta) {
+			case 'lifebook_header':
+				$block['content'] = array(
+						'#theme' => 'lifebook_header',
+				);
+			break;
+			case 'lifebook_app_class_preview':
+				$block['content'] = array(
+						'#theme' => 'lifebook_class_preview',			
+				);
+			break;
+			case 'lifebook_app_content':
+				$block['content'] = array(
+						'#theme' => 'lifebook_sidebar_first',
+				);
+			break;
+			case 'lifebook_app_tools':
+				$block['content'] = array(
+						'#theme' => 'lifebook_sidebar_second',
+				);
+			break;
+		};
+	};
+	$block['subject'] = '<none>';
+	return $block;
+}
+
+function lifebook_app_canvas_preview($entity){
+	global $user, $lifebook,$base_url;
+	$ra =  field_view_value("project", $entity, "field_canvas_preview",$entity->field_canvas_preview["und"][0],"full");
+	$ra["#path"] = array(
+			'path' => $base_url."/appx/".$entity->id,
+			'options' => array(
+					'attributes' => array(
+							'class' => array("use-ajax"),
+							'data-entity_id' => $entity->id,
+					),
+			),
+	);
+	return $ra;
+}
+function _get_student_info($s) {
+	$dis = array(
+			'settings' => array('image_style' => 'student_list_preview'),
+			'label' => 'hidden'
+	);
+	$out = array(
+		"id"=> $s->id,
+		"first_name"=> _getBasicValue("project", $s, "field_first_name"),
+		"last_name"	=> _getBasicValue("project", $s, "field_last_name"),
+		"text"	=> _getBasicValue("project", $s, "field_text"),
+		"page" 		=> _getBasicValue("project", $s, "field_page", "", "target_id")			);
+	if(isset($s->field_group_picture["und"])){
+		$out["group_picture"] = field_view_value("project", $s, "field_group_picture",$s->field_group_picture["und"][0], $dis );
+	}
+	if(isset($s->field_passport["und"])){
+		$out["passport"]  = field_view_value("project", $s, 'field_passport', $s->field_passport["und"][0], $dis );
+	}
+	return $out;
+}
+function _get_students_list($param, $form=true) {
+	foreach ($param as $k => $v){
+		$s = entity_load_single("project", $v);
+		$students[$k] = _get_student_info($s);
+		if($form){
+			$f = array("field_first_name",
+					"field_last_name",
+					"field_text",
+					"field_passport",
+					"field_group_picture");
+			$form = drupal_get_form("partial_fields_form", $f, $s);
+			$form = _form_ajax_setup($form);
+			$form["actions"]["submit"]["#ajax"] = array(
+						'callback' => '_student_form_callback');
+			$students[$k]["form"] = $form;
+		};
+	}
+	return $students;
+}
+function partial_fields_form($form, &$form_state, $fields , $entity) {
+	$form["#entity"] = $entity ;
+	$form["#_fields"] = $fields ;
+	foreach($fields as $field){
+		_attach_field($field, strtolower(get_class($entity)), $entity->type, $entity, $form, $form_state);	
+	}
+	$form['submit'] = array(
+			    '#type' => 'submit',
+			    '#value' => t('Submit'),
+				'#ajax' => array(
+					"callback" => "partial_fields_form_ajax_callback",
+					"wrapper" => "xxxx"
+				)
+	);
+	$form =  _class_pictures_form_theme($form);
+	return $form;
+}
+function partial_fields_form_submit($form, &$form_state) {
+	// get user object
+	$entity = $form["#entity"];
+	$fields = $form["#_fields"];
+	foreach ($fields as $field){
+		$entity->$field = $form_state['values'][$field];
+	};
+	project_save($entity);
+	//set message
+	drupal_set_message('content updated!');
+}
+function _form_ajax_setup($form) {
+	$form['#prefix'] = '<div id="'.$form["#build_id"].'" class="xxxx">';
+	$form["#suffix"] = '</div>';
+		
+	/* $form['#ajax'] = array(
+					"callback" => "partial_fields_form_ajax_callback",
+					"wrapper" => "xxxx"
+	); */
+	
+	return $form;
+}
+function partial_fields_form_ajax_callback($form, &$form_state) {
+	//return $form;
+	$form = _class_pictures_form_theme($form);
+	$commands = array();
+	$commands[] =	ajax_command_replace("#".$form["#build_id"], drupal_render($form));
+	return array(
+			'#type' => 'ajax',
+			'#commands' => $commands,
+	);
+}
+function _class_pictures_form_theme($form){
+	$form['field_image_form']["field_image"]["und"]["#theme"] = "file_widget_multiple_override";
+	$form['field_image_form']["field_image"]["und"]["#theme_wrappers"] = array();
+	return $form;
+}
+function _attach_field($field_name, $entity_type, $entity_bundle, $entity, &$form, &$form_state){
+	$form['#parents'] = array();// we need to add this empty array, or we will get an ugly error
+	$field = field_info_field($field_name);
+	$instance = field_info_instance($entity_type, $field_name, $entity_bundle);
+	$items = field_get_items($entity_type, $entity, $field_name);
+	$form[$field_name."_form"] = field_default_form($entity_type, $entity, $field, $instance, LANGUAGE_NONE, $items, $form, $form_state);
+}
+
+function _page_form_callback($param) {
+	$page = entity_load_single("project", $param["#entity"]->id);
+	$commands = array();
+	$commands[] =	ajax_command_replace("#".$param["#build_id"], drupal_render($param));
+/* 	$commands[] =	array(
+    	'command' => 'update_student',
+    	'data' => $student
+  	);
+ */	
+	return array(
+			'#type' => 'ajax',
+			'#commands' => $commands,
+	);
+}
+function _student_form_callback($param) {
+	$student = _get_student_info(entity_load_single("project", $param["#entity"]->id));
+
+	//$f = $param["field_first_name"]["und"][0]["value"]["#value"];
+	//$l = $param["field_last_name"]["und"][0]["value"]["#value"];
+	
+	$first_name = '<span class="first_name">'.$student["first_name"].' </span>';
+	$last_name = '<span class="las_name">'.$student["last_name"].'</span>';
+	$commands = array();
+	$commands[] =	ajax_command_replace("#".$param["#build_id"], drupal_render($param));
+	$commands[] =	ajax_command_replace('.student[data-student_id="'.$student["id"].'"] .preview  .first_name', $first_name );
+	$commands[] =	ajax_command_replace('.student[data-student_id="'.$student["id"].'"] .preview  .last_name', $last_name );
+	$commands[] =	array(
+    	'command' => 'update_student',
+    	'data' => $student
+  	);
+	
+	//$commands[] =	ajax_command_settings($html[0]["#attached"]["js"][3]["data"], true);
+	return array(
+			'#type' => 'ajax',
+			'#commands' => $commands,
+	);
+	//return drupal_render($param);
+}
+
+/*
+ * Get the first sanitized value of the field.
+*
+* @param string $type
+* This should be the string representation of the entity type.
+* Example: 'node', 'taxonomy'
+* @param mixed $entity
+* The entity that owns the field
+* @param string $field
+* The field name as a string
+* @param string $default
+* The string to return if no value is found for the field. DEFAULT empty string
+* @return string $ind
+* Returns the sanitized value of the field, minus the markup
+**/
+ 
+
+function _getBasicValue($type, $entity, $field, $default = '', $ind = ''){
+	$result = field_get_items($type, $entity, $field);
+	if(!empty($result)) {
+		$result = array_shift($result);
+		if(empty($ind)){
+			$ind = !empty($result['safe_value']) ? 'safe_value' : 'value';
+		}
+		if(!empty($result[$ind])) {
+			return $result[$ind];
+		}
+	}
+	return $default;
+}
+/*
+ function lifebook_app_module_form_project_form_alter(&$form, &$form_state){
+if(arg(0) === "app"){
+form_load_include($form_state, 'inc', 'project', 'includes/project.pages');
+unset(	$form["title"],
+		$form["actions"]["delete"]);
+$form['#suffix'] = '</div>';
+
+
+if($form["#entity"]->type === "page"){
+$form['#prefix'] = '<div id="'.$form["#build_id"].'" class="page_form">';
+unset(	$form["field_canvas_preview"],
+		$form["og_group_chapter_ref"]);
+$form["actions"]["submit"]["#ajax"] = array(
+		'callback' => '_page_form_callback',
+		//'event' => 'save_canvas_and_submit',
+);
+}
+}
+}
+*/

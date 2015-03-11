@@ -1,0 +1,51 @@
+/*
+.student_add_to_page
+*/
+.student_add_to_page .on_page{
+/*	display : none;*/
+	background-color: #444;
+}
+
+/*
+sidebar first #START
+*/
+.students_list{
+	padding:0 !important;
+	cursor:pointer
+}
+.students_list .student .preview{
+	border-bottom:1px solid gray;
+	min-height:25px;
+	padding: 0 5px;
+}
+.students_list .form{
+	border-bottom:1px solid gray;
+}
+.students_list .student span{
+	vertical-align: top;
+}
+.students_list .form label{
+display: inline;
+}
+.students_list .form .form-item	{	
+	white-space: nowrap	;
+	margin-bottom: 0px;
+}
+.students_list .form .image-widget-data span{  
+display: none;
+}	
+.preview_canvas img{
+margin:0 10px;
+}
+.widget >  [type=submit]{
+  position:absolute;
+  bottom:0px; 
+  right:0px;
+  width:10px
+}
+
+.widget {
+  position:relative;
+  border: 1px solid red;
+  display: inline-block;
+}

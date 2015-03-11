@@ -1,0 +1,416 @@
+<?php
+/**
+ * project custom entity module.
+ * @file
+ */
+
+/**
+ * Implements hook_menu().
+ */
+function project_menu() {
+  $items = array();
+
+  $items['project'] = array(
+    'title' => 'View all Projects',
+    'page callback' => 'project_view_all',
+    'access callback' => 'project_access',
+    'access arguments' => array('view all'),
+    'file' => 'includes/project.pages.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $uri_add_position = count(explode('/', 'project/add'));
+  $items['project/add/%'] = array(
+    'title' => 'Add',
+    'page callback' => 'project_add',
+    'page arguments' => array($uri_add_position),
+    'access callback' => 'project_access',
+    'access arguments' => array('edit', $uri_add_position),
+    'file' => 'includes/project.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  $project_uri = 'project/%project';
+  $uri_position = count(explode('/', 'project'));
+
+  $items[$project_uri] = array(
+    'title callback' => 'entity_label',
+    'title arguments' => array('project', $uri_position),
+    'page callback' => 'project_view',
+    'page arguments' => array($uri_position),
+    'access callback' => 'project_access',
+    'access arguments' => array('view', $uri_position),
+    'file' => 'includes/project.pages.inc',
+  );
+
+  $items[$project_uri . '/view'] = array(
+    'title' => 'View',
+    'type' => MENU_DEFAULT_LOCAL_TASK,
+    'weight' => -10,
+  );
+
+  $items[$project_uri . '/edit'] = array(
+    'title' => 'Edit',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('project_form', $uri_position),
+    'access callback' => 'project_access',
+    'access arguments' => array('edit', $uri_position),
+    'file' => 'includes/project.pages.inc',
+    'type' => MENU_LOCAL_TASK,
+    'context' => MENU_CONTEXT_PAGE | MENU_CONTEXT_INLINE,
+  );
+
+  $items[$project_uri . '/delete'] = array(
+    'title' => 'Delete',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('project_delete_form', $uri_position),
+    'access callback' => 'project_access',
+    'access arguments' => array('edit', $uri_position),
+    'file' => 'includes/project.pages.inc',
+  );
+
+  $items['admin/config/project'] = array(
+    'title' => 'Project',
+    'description' => 'Configure Project.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('project_config'),
+    'access arguments' => array('administer project'),
+    'file' => 'includes/project.pages.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_entity_info().
+ */
+function project_entity_info() {
+  $info['project'] = array(
+    'label' => t('Project'),
+    'module' => 'project',
+    'entity class' => 'Project',
+    'controller class' => 'ProjectController',
+    'metadata controller class' => 'ProjectMetadataController',
+    'views controller class' => 'ProjectViewsController',
+    'base table' => 'project',
+    'revision table' => 'project_revision',
+    'access callback' => 'project_access',
+    // Make use the class' label() and uri() implementation by default.
+    'label callback' => 'entity_class_label',
+    'uri callback' => 'entity_class_uri',
+    'load hook' => 'project_load',
+    'entity keys' => array(
+      'id' => 'id',
+      'revision' => 'rid',
+      'bundle' => 'type',
+    ),
+    'bundles' => array(),
+    'bundle keys' => array(
+      'bundle' => 'type',
+    ),
+    'fieldable' => TRUE,
+    'view modes' => array(
+      'full' => array(
+        'label' => t('Full'),
+        'custom settings' => TRUE,
+      ),
+    ),
+  );
+
+  $info['project_type'] = array(
+    'label' => t('Project type'),
+    'module' => 'project',
+    'base table' => 'project_type',
+    'entity class' => 'Entity',
+    'controller class' => 'EntityAPIControllerExportable',
+    'bundle of' => 'project',
+    'access callback' => 'project_access',
+    'fieldable' => FALSE,
+    'exportable' => TRUE,
+    'entity keys' => array(
+      'id' => 'id',
+      'name' => 'type',
+      'label' => 'name',
+    ),
+    'admin ui' => array(
+      'path' => 'admin/structure/project',
+      'controller class' => 'ProjectUIController',
+      'file' => 'includes/project.ui_controller.inc',
+      'access arguments' => array('administer project'),
+    ),
+  );
+
+  // Add bundle info but bypass entity_load() as we cannot use it here.
+  $types = db_select('project_type', 'et')
+    ->fields('et')
+    ->execute()
+    ->fetchAllAssoc('type');
+
+  $bundle_argument = count(explode('/', 'admin/structure/project/manage'));
+  foreach ($types as $name => $type) {
+    $info['project']['bundles'][$name] = array(
+      'label' => $name,
+      'admin' => array(
+        'path' => 'admin/structure/project/manage/%project_type',
+        'real path' => 'admin/structure/project/manage/' . $type->type,
+        'bundle argument' => $bundle_argument,
+        'access arguments' => array('administer project'),
+      ),
+    );
+  }
+
+  // Support entity cache module.
+  if (module_exists('entitycache')) {
+    $info['project']['field cache'] = FALSE;
+    $info['project']['entity cache'] = TRUE;
+  }
+
+  return $info;
+}
+
+/**
+ * Implements hook_metadata_hook_entity_info().
+ */
+function project_metadata_hook_entity_info() {
+  return array(
+    'project' => array(
+      'plural label' => t('Projects'),
+      'description' => t('Project custom entity.'),
+      'creation callback' => 'project_create',
+      'save callback' => 'project_save',
+      'deletion callback' => 'project_delete',
+      //'view callback' => 'project_view',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ */
+function project_field_extra_fields() {
+  $extra = array();
+
+  $types = project_get_types();
+  foreach ($types as $name => $type) {
+    $extra['project'][$name] = array(
+      'form' => array(
+        'title' => array(
+          'label' => t('Title'),
+          'description' => t('Project title.'),
+          'weight' => 0,
+        ),
+      ),
+      'display' => array(
+        'title' => array(
+          'label' => t('Title'),
+          'description' => t('Project title.'),
+          'weight' => 0,
+        ),
+      ),
+    );
+  }
+
+  return $extra;
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function project_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'project') . '/views',
+  );
+}
+
+/**
+ * Implements hook_permission().
+ */
+function project_permission() {
+  return array(
+    'administer project' => array(
+      'title' => t('Administer Project'),
+      'description' => t('Administer Project.'),
+    ),
+    'use project' => array(
+      'title' => t('Use Project'),
+      'description' => t('Use Project.'),
+    ),
+  );
+}
+
+/* API */
+
+/**
+ * Gets an array of all Project bundle types, keyed by the name.
+ *
+ * @param $type
+ *   If set, the type with the given name is returned.
+ */
+function project_get_types($type = NULL) {
+  $types = entity_load_multiple_by_name('project_type', isset($type) ? array($type) : FALSE);
+  return isset($type) ? reset($types) : $types;
+}
+
+/**
+ * Project type loader.
+ *
+ * @param $type
+ *   (optional) The name for this Project type. If no type is given all
+ *   existing types are returned.
+ *
+ * @return Entity
+ *   Returns a fully-loaded Project type definition if a type name is
+ *   passed. Else an array containing all types is returned.
+ */
+function project_type_load($type = NULL) {
+  // Replace dashes with underscores so this can be used as menu argument
+  // loader too.
+  $types = entity_load_multiple_by_name('project_type', isset($type) ? array(strtr($type, array('-' => '_'))) : FALSE);
+  if (isset($type)) {
+    return isset($types[$type]) ? $types[$type] : FALSE;
+  }
+  return $types;
+}
+
+/**
+ * Access callback for Project entity.
+ *
+ * @see entity_access().
+ */
+function project_access($op, $project = NULL, $account = NULL, $entity_type = NULL) {
+  if (user_access('administer project') || user_access('use project')) {
+    return TRUE;
+  }
+}
+
+/**
+ * Callback to create a new Project entity.
+ */
+function project_create($values = array()) {
+  $controller = entity_get_controller('project');
+  return $controller->create($values);
+}
+
+/**
+ * Load Project entity.
+ */
+function project_load($id, $reset = FALSE) {
+  $projects = project_load_multiple(array($id), array(), $reset);
+  return reset($projects);
+}
+
+/**
+ * Load multiple Projects based on certain conditions.
+ */
+function project_load_multiple($ids = array(), $conditions = array(), $reset = FALSE) {
+  return entity_load('project', $ids, $conditions, $reset);
+}
+
+/**
+ * Save Project entity.
+ */
+function project_save($project) {
+	entity_save('project', $project);
+	if($project->type === "page"){	
+		$field = field_get_items("project", $project, "field_canvas");
+		if(count($field) >= 1){
+			$json = $field[0]["json"];// $page["field_canvas"]["und"][0]["json"];
+		
+			$tmp_directory = file_directory_temp();
+			$name = '/canvas_preview_'.time().'.png';
+			$tmp_file = $tmp_directory.$name;
+			
+			$result = _exec($json, $tmp_file );
+			
+			$handle = fopen($tmp_file , 'w+');
+			if($handle && filesize($tmp_file)){
+				$file = file_save_data($handle, 'public://'.$name);
+				
+				$wrapper = entity_metadata_wrapper('project', $project->id);
+				$wrapper->field_canvas_preview = array('fid' => $file->fid);
+				$wrapper->save();
+			} else {
+				watchdog("project", "error generating canvas preview image");
+			}
+			fclose($handle);
+			unlink($tmp_file);
+		}
+	}
+}
+function _exec($data, $tmp_file){
+	global $base_url;
+	require_once $_SERVER["DOCUMENT_ROOT"].'/PHPNodeJS.php';
+	$debug = false;
+	$PHPNodeJS = new PHPNodeJS($debug);
+	
+	// example 1 (run simple script without function)
+	return $PHPNodeJS->run('
+    var fs = require("fs"),
+    fabric = require("fabric").fabric,
+    out = fs.createWriteStream("'.$tmp_file.'");
+	
+var canvas = fabric.createCanvasForNode(200, 200);
+var data = '.$data.';
+canvas.loadFromJSON(data, function() {
+var stream = canvas.createPNGStream();
+stream.on("data", function(chunk) {
+  out.write(chunk);
+});})
+');
+
+}
+/**
+ * Delete Project entity.
+ */
+function project_delete($project) {
+  entity_delete('project', entity_id('project', $project));
+}
+
+/**
+ * Delete multiple Projects entity.
+ */
+function project_delete_multiple($ids) {
+  entity_delete_multiple('project', $ids);
+}
+
+/**
+ * Fetches an array of exportables from files.
+ *
+ * This helper function allow you for example to separate views exported
+ * configurations into separate files.
+ *
+ * @param $module
+ *   The module invoking this request. (Can be called by other modules.)
+ * @param $directory
+ *   The subdirectory in the custom module.
+ * @param $extension
+ *   The file extension.
+ * @param $name
+ *   The name of the variable found in each file. Defaults to the same as
+ *   $extension.
+ *
+ * @return array
+ *   Array of $name objects.
+ *
+ * NOTE - you probably want just one implementation of this function in one of
+ * your core custom modules - you can then use this function definition from
+ * your core custom module.
+ */
+function project_exports($module, $directory, $extension, $name = NULL) {
+  if (!$name) {
+    $name = $extension;
+  }
+  $return = array();
+  // Find all the files in the directory with the correct extension.
+  $files = file_scan_directory(drupal_get_path('module', $module) . "/$directory", "/\.{$extension}$/");
+  foreach ($files as $path => $file) {
+    require DRUPAL_ROOT . '/' . $path;
+    if (isset($name) && !empty($$name)) {
+      $return[$$name->name] = $$name;
+    }
+  }
+  return $return;
+}

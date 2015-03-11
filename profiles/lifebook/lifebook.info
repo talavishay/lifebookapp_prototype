@@ -1,0 +1,24 @@
+name = lifebook
+description = Start with only a few modules enabled.
+core = 7.x
+dependencies[] = block
+dependencies[] = field_ui
+dependencies[] = ctools
+dependencies[] = entity
+dependencies[] = entityreference
+dependencies[] = fabric_canvas_view
+dependencies[] = fabric_canvas_view_field
+dependencies[] = features
+dependencies[] = file_resup
+dependencies[] = jquery_update
+dependencies[] = lifebook_app_module
+dependencies[] = og
+dependencies[] = og_ui
+dependencies[] = project
+dependencies[] = project_bundels
+dependencies[] = views
+dependencies[] = views_bulk_operations
+dependencies[] = admin_menu
+
+
+theme = lifebook_app

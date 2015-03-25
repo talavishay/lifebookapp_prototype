@@ -9,7 +9,6 @@
  */
 function project_menu() {
   $items = array();
-
   $items['project'] = array(
     'title' => 'View all Projects',
     'page callback' => 'project_view_all',
@@ -78,6 +77,30 @@ function project_menu() {
     'access arguments' => array('administer project'),
     'file' => 'includes/project.pages.inc',
     'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['project/jtable/create'] = array(
+    'title' => 'project jtable create',
+    'page callback' => 'project_jtable_create',
+    'page arguments' => array(3),
+    'access callback' => true,
+    'file' => 'includes/project.jtable.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['project/jtable/delete'] = array(
+    'title' => 'project jtable delete',
+    'page callback' => 'project_jtable_delete',
+    'access callback' => true,
+    'file' => 'includes/project.jtable.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['project/jtable/list'] = array(
+    'title' => 'project jtable list',
+    'page callback' => 'project_jtable_list',
+    'access callback' => true,
+    'file' => 'includes/project.jtable.inc',
+    'type' => MENU_CALLBACK,
   );
 
   return $items;

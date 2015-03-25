@@ -1,5 +1,8 @@
-
 jQuery(document).ready(function(){
+
+if(typeof Drupal.settings.lifebook != "object"){
+Drupal.settings.lifebook = {};
+}
 
 Drupal.settings.lifebook._setup = function(){
 	Drupal.settings.lifebook.update_stage = function(ajax, response, status){
@@ -112,9 +115,9 @@ Drupal.settings.lifebook._init = function(){
 	});
 };
 
-
 Drupal.settings.lifebook._setup();	
 Drupal.settings.lifebook._init();
+
 
 Drupal.behaviors.loginAjax = { 
   attach: function (context ,settings) { 

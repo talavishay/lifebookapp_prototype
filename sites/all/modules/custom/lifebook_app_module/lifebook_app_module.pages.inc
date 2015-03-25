@@ -1,15 +1,29 @@
 <?php
-function _app_setup(){
+function _app_setup($user){
 	drupal_add_library('system', 'ui.accordion');
-	drupal_add_js(drupal_get_path("module", "lifebook_app_module")."/js/app.js");
+	drupal_add_library('system', 'ui.dialog');
 	drupal_add_css(drupal_get_path("module", "lifebook_app_module")."/css/app.css");
 	drupal_add_library('system', 'drupal.ajax');
 
 	drupal_set_title('');
 	drupal_set_breadcrumb(array());
+	if($user->uid !== 0){
+		drupal_add_js(drupal_get_path("module", "lifebook_app_module")."/js/app.js");
+	} else {
+		drupal_add_js(array("user" => $user), 'setting'  );
+	
+	}
 }
 function lifebook_app_callback($project, $class) {
-	_app_setup();
+	global $user;
+	_app_setup($user);
+	
+	if($user->uid == 0){
+			
+		return print_r($user, true);
+		//die();
+		//exit();
+	}
 	$arg = arg();
 	$res = module_load_include("inc", "project","includes/project.pages");
 	foreach (_get_project_content($arg[1]) as $k => $v){

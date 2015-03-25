@@ -7,7 +7,6 @@
  * @see https://drupal.org/node/1728096
  */
 
-
 /**
  * Override or insert variables into the maintenance page template.
  *

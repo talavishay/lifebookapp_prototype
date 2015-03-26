@@ -72,16 +72,18 @@ function _add_entity(e){
 function _entity_setup(e, created){
 	var	entity = jQuery.merge(e,{});
 	delete entity.length;
-
+	
 	if(e.type == "chapter"){
 		entity.og_group_book_ref = { "und" :  {target_id :book.id }} ;
 	};
-	if(e.type == "page"){
-		entity.og_group_chapter_ref = { "und" : { target_id : book.chapters[0].id }} ;
-	};
-	if(e.type == "student"){
-		entity.og_group_student_chapter_ref = { "und" : { target_id : book.chapters[0].id }} ;
-	};
+	if(book.chapters[0]){
+		if(e.type == "page"){
+			entity.og_group_chapter_ref = { "und" : { target_id : book.chapters[0].id }} ;
+		};
+		if(e.type == "student"){
+			entity.og_group_student_chapter_ref = { "und" : { target_id : book.chapters[0].id }} ;
+		};
+	}
 	return entity;
 }
 function _init_table(csv){

@@ -335,20 +335,27 @@ function project_load_multiple($ids = array(), $conditions = array(), $reset = F
 /**
  * Save Project entity.
  */
-function project_save($project) {
-	entity_save('project', $project);
-	if($project->type === "page"){	
+function project_save($project, $type = "") {
+	$res = entity_save('project', $project);
+	if($type === "" ){
+	$type = $project->type;
+	}
+	$emw= entity_metadata_wrapper("project" , $project, array("bundle" => $type));
+	$project =  $emw->value();
+//	$i = $project->getPropertyInfo();
+	if($type === "page"){	
 		$field = field_get_items("project", $project, "field_canvas");
 		if(count($field) >= 1){
 			$json = $field[0]["json"];// $page["field_canvas"]["und"][0]["json"];
 		
-			$tmp_directory = file_directory_temp();
+			//$tmp_directory = file_directory_temp();
+			$tmp_directory = $_SERVER["DOCUMENT_ROOT"];
 			$name = '/canvas_preview_'.time().'.png';
 			$tmp_file = $tmp_directory.$name;
-			
-			$result = _exec($json, $tmp_file );
-			
-			$handle = fopen($tmp_file , 'w+');
+
+			$result = _exec($json, $tmp_file );		
+			$handle = fopen($tmp_file , 'r');
+					
 			if($handle && filesize($tmp_file)){
 				$file = file_save_data($handle, 'public://'.$name);
 				
@@ -369,11 +376,10 @@ function _exec($data, $tmp_file){
 	$debug = false;
 	$PHPNodeJS = new PHPNodeJS($debug);
 	
-	// example 1 (run simple script without function)
 	return $PHPNodeJS->run('
     var fs = require("fs"),
-    fabric = require("fabric").fabric,
-    out = fs.createWriteStream("'.$tmp_file.'");
+    fabric = require("/usr/local/lib/node_modules/fabric").fabric,
+    out = fs.createWriteStream("'.$tmp_file.'", {mode:0777});
 	
 var canvas = fabric.createCanvasForNode(200, 200);
 var data = '.$data.';

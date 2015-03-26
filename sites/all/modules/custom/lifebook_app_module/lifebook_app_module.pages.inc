@@ -62,12 +62,15 @@ function lifebook_app_callback($project, $class) {
 }
 
 function test_callback() {
-	$e = entity_load_single("project", 10);
+	//$e = entity_load_single("project", 10);
 	//return	drupal_get_form("multiple_image_form", "field_image", $e, "chapter");
-	$form = drupal_get_form("partial_fields_form", array("field_image") , $e);
-	$form = _form_ajax_setup($form);
+	//$form = drupal_get_form("partial_fields_form", array("field_image") , $e);
+	//$form = _form_ajax_setup($form);
 	//$out =  _class_pictures_form_theme($form);
-	return $form;
+	//return $form;
+	
+	drupal_add_library('system', 'ui.dialog');
+	return "XXX";
 }
 
 function lifebook_app_callback_ajax($id) {

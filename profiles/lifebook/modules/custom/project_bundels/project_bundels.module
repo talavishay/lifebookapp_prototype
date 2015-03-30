@@ -1,0 +1,7 @@
+<?php
+/**
+ * @file
+ * Code for the project_bundels feature.
+ */
+
+include_once 'project_bundels.features.inc';

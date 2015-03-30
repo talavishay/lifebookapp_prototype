@@ -1,14 +1,14 @@
 type,title,first_name,last_name
-book,my_book
-chapter,my_chapter
-page,my_page
-page,my_page
-page,my_page
-page,my_page
-page,my_page
-student,eli_cohen,eli,cohen
-student,eli_cohen,eli,cohen
-student,eli_cohen,eli,cohen
-student,eli_cohen,eli,cohen
-student,eli_cohen,eli,cohen
-student,eli_cohen,eli,cohen
+book,מקיף ג - קרית ארבע
+chapter,כיתה ח1
+page,דף 1
+page,דף 2
+page,דף 3 
+page,דף 4
+page,דף 5
+student,אלי,אלי,cohen
+student,איציק,איציק,cohen
+student,משה,משה,cohen
+student,אלישבע,אלישבע,cohen
+student,אייל,אייל,cohen
+

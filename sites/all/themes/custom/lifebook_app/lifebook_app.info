@@ -8,15 +8,6 @@ name        = Zen Sub-theme Starter Kit
 description = Read the <a href="https://drupal.org/node/873778">online docs</a> or the included README.txt on how to create a theme with Zen.
 ;;;;;
 
-scripts[] = js/script.js
-scripts[] = js/papaparse.min.js
-scripts[] = js/jquery.csvToTable.js
-
-;<!-- Include one of jTable styles. -->
-stylesheets[all][] = js/jtable/themes/metro/blue/jtable.min.css
-scripts[] = js/jtable/jquery.jtable.min.js
-
-
 
 ; This section controls the CSS files for your theme. There are 3 different
 ; things you can do with a "stylesheets" line:

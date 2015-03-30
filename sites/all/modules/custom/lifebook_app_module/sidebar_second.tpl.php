@@ -1,20 +1,12 @@
 <div class="accordion">
 	<h3>פספורטים מלייף בוק</h3>
 	<div id="lifebook_passport">
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
+		---
 	</div>
 	
 	<h3>תמונות מלייף בוק</h3>
 	<div id="lifebook_passport">
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
+		---
 	</div>
 	
 

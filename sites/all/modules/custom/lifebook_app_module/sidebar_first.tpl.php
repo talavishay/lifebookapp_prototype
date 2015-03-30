@@ -1,37 +1,25 @@
 <div class="accordion">
 	<h3>עיצוב עמוד</h3>
-	<div id="lifebook_passport">
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
+	<div id="design">
+		--
 	</div>
 	
 	<h3>רקעים</h3>
-	<div id="lifebook_passport">
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
-		<p>avasvasvs</p>
+	<div id="background">
+		--
 	</div>
 	
 
 	
 	<h3>עיצוב טקסט</h3>
-	<div id="upload">
-	<p>avasvasvs</p>
-	<p>avasvasvs</p>
-	<p>avasvasvs</p>
-	<p>avasvasvs</p>
-	<p>avasvasvs</p>
+	<div id="text_design">
+	--
 	</div>
 	
 
 
 	<h3>מסגרות ואפקטים לתמונה</h3>
-	<div class="students_list" > 
+	<div class="frames" > 
 	
 	</div>
 

@@ -70,7 +70,20 @@ function test_callback() {
 	//return $form;
 	
 	drupal_add_library('system', 'ui.dialog');
-	return "XXX";
+	$entity_info = entity_get_info("project")['bundles'] ;
+	$e = array_keys($entity_info);
+	foreach($e as $k => $v){
+		$bundles[] = array(
+			"id" =>$v, 
+			"title" => $v
+		);
+	};
+		
+	dpm($bundles);
+	return array(
+			'#theme' => 'select_class',
+			//'#list' => array("1"=>"1","2"=>"2","3"=>"3"));
+			'#list' => $bundles);
 }
 
 function lifebook_app_callback_ajax($id) {

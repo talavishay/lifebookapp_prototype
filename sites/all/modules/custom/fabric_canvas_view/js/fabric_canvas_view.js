@@ -798,14 +798,15 @@ function add_content(canvas){
 	//draw_rect(canvas);
 	//set_background_img(canvas);
 }
-function add_text(data ){
+function add_text(data , type){
+	
 	var data = typeof data === "undefined" ? 'hello world': data;
 	
 	var text = new fabric.IText(data, { 
 		textAlign: "right",
 		left: 100, 
 		top: 100,
-		name:"bab"
+		
 	});
 	text.on('changed', function(e) {
 		jQuery("#addText").val(this.text);
@@ -819,7 +820,7 @@ function add_text(data ){
 	
 	var canvas = Drupal.settings.canvas_view.getActiveCanvas(canvas);
 	canvas.add(text);
-	_rand_positioning(text)
+	_rand_positioning(text);
 	canvas.setActiveObject(text);
 		
 	return text;
@@ -1604,10 +1605,12 @@ function click_delete(e){
 					_delete_fid(active.name.replace(/^fid_/, ""));
 				}
 			}
-			if(active.name === "student" ){
-				Drupal.settings.lifebook._remove_student_page(active.student_id);
-			}
 		}
+		
+		if(typeof active.lifebook_type === "string" && active.lifebook_type === "student" ){
+			Drupal.settings.lifebook._remove_student_page(active.lifebook_data.student_id);
+		}
+		
 		active.remove();
 		if(canvas.getActiveGroup()){
 		  canvas.getActiveGroup().forEachObject(function(o){ canvas.remove(o) });

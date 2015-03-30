@@ -63,7 +63,8 @@ Drupal.settings.lifebook._get_student = function(val){
 	page_id = parseInt(val.page),
 	f = first_name.clone().html(val.first_name+" "),
 	l = last_name.clone().html(val.last_name),
-	item = student.clone().append(preview.clone().append(f).append(l).append(page));
+	p = page.clone().html(page_id),
+	item = student.clone().append(preview.clone().append(f).append(l).append(p));
 	
 	//if(typeof val.page.und !== "undefined"){
 		//page_id = val.page.und[0].target_id;
@@ -81,8 +82,6 @@ Drupal.settings.lifebook._get_student = function(val){
 				return item;
 			}
 		});
-		
-		
 		jQuery(e.currentTarget).addClass("on_page");
 		
 		Drupal.settings.lifebook.student_add_to_page(d[0]);
@@ -104,7 +103,8 @@ Drupal.settings.lifebook._init = function(){
 
 	jQuery(list).dialog({
 		dialogClass	: "student_add_to_page",
-		title		:"student list",
+		title		:"הוסף טקסט של תלמיד לעמוד זה",
+		width		:150,
 		position 	: {
 				at :"right top",
 				my :"left top",
@@ -113,37 +113,12 @@ Drupal.settings.lifebook._init = function(){
 				collision: "none"
 		}
 	});
+	
 };
 
 Drupal.settings.lifebook._setup();	
 Drupal.settings.lifebook._init();
 
 
-Drupal.behaviors.loginAjax = { 
-  attach: function (context ,settings) { 
-    // Cache the form object
-    console.log("attach");
-    var form = jQuery(".page_form form", context);
-    var submitButton = jQuery('input[type="submit"]', form);
-
-    // Use once so we dont attach submit multiple times
-    // Use off to remove any existing submit handler
-    submitButton
-      .once('loginAjax')
-      .off('click mousedown keypress')
-      .on('click mousedown keypress', function(e){
-		e.preventDefault();
-		var form = jQuery(this);
-
-      // Run validation on $form object.
-		console.log("XXX");
-      // If success, trigger event on button
-		if(valid) {
-		//  submitButton.trigger('save_canvas_and_submit');
-		}
-		return false;
-    });
-  }
-}
 
 });

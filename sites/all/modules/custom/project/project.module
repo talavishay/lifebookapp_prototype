@@ -17,6 +17,7 @@ function project_menu() {
     'file' => 'includes/project.pages.inc',
     'type' => MENU_CALLBACK,
   );
+  
 
   $uri_add_position = count(explode('/', 'project/add'));
   $items['project/add/%'] = array(
@@ -42,6 +43,19 @@ function project_menu() {
     'access arguments' => array('view', $uri_position),
     'file' => 'includes/project.pages.inc',
   );
+
+  $items[$project_uri . '/view/dialog'] = array(
+    'title callback' => 'entity_label',
+    'title arguments' => array('project', $uri_position),
+    'page callback' => 'project_view_dialog',
+    'page arguments' => array($uri_position),
+    'access callback' => 'project_access',
+    'access arguments' => array('view', $uri_position),
+    'file' => 'includes/project.pages.inc',
+    'delivery callback' => 'drupal_exit',
+	'type' => MENU_CALLBACK,
+  );
+
 
   $items[$project_uri . '/view'] = array(
     'title' => 'View',
@@ -350,14 +364,14 @@ function project_save($project, $type = "") {
 		
 			//$tmp_directory = file_directory_temp();
 			$tmp_directory = $_SERVER["DOCUMENT_ROOT"];
-			$name = '/canvas_preview_'.time().'.png';
+			$name = '/'.$project->type.'_'.$project->id.'.png';
 			$tmp_file = $tmp_directory.$name;
 
 			$result = _exec($json, $tmp_file );		
 			$handle = fopen($tmp_file , 'r');
 					
 			if($handle && filesize($tmp_file)){
-				$file = file_save_data($handle, 'public://'.$name);
+				$file = file_save_data($handle, 'public://field_canvas_preview/'.$name);
 				
 				$wrapper = entity_metadata_wrapper('project', $project->id);
 				$wrapper->field_canvas_preview = array('fid' => $file->fid);

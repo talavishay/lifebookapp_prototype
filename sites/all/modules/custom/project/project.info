@@ -15,3 +15,7 @@ files[] = includes/project.info.inc
 ; Views integration and handlers.
 files[] = views/project.views.inc
 files[] = views/handlers/project_handler_field_operations.inc
+
+
+
+files[] = projectFieldQuery.php

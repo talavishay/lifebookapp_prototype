@@ -1,0 +1,41 @@
+.region.toggle{
+	width: 2.5em;
+	padding: 0px;
+}
+
+.region.toggle .ui-accordion-content{
+	display: none !important;;
+}
+.region h3{
+	line-height: 1.9em ;	
+	max-height: 2.3em;
+}
+.sidebars{
+		position : relative;
+/* 	opacity: .82; */
+}
+
+.region-sidebar-second{
+	position:	absolute;
+	right	:	0px;
+	top		:	0px;
+	margin	:	0px !important;
+}
+.toggle .ui-accordion > * {
+	padding: 0.1em 0.22em;
+/*     font-size-adjust: 0.47; */
+    font-weight: bold;
+}
+
+/*
+.toglging .ui-accordion h3 {
+/*
+.toggle .ui-accordion-content {
+
+	display : none !important;
+}
+.toglging .ui-accordion-icons{
+	min-height:20px;
+	min-width:20px;
+}
+*/

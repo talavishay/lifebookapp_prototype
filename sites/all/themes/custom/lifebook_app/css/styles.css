@@ -7,16 +7,25 @@
  */
 
 /* HTML element (SMACSS base) rules */
+/*
 @import "normalize.css";
+*/
 
 /* Layout rules */
 @import "layouts/responsive.css";
 
 /* Component (SMACSS module) rules */
+/*
 @import "components/misc.css";
+*/
 /* Optionally, add your own components here. */
+/*
 @import "print.css";
+*/
 
 /* SMACSS theme rules */
 /* @import "theme-A.css"; */
 /* @import "theme-B.css"; */
+
+
+@import "colors.css";

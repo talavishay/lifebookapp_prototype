@@ -1,12 +1,21 @@
 <div class="accordion">
+	<?php 	global $lifebook;	?>
+	<?php if ($lifebook["display_mode"] === "mobile") :	?>
+		<h3>עמודי ספר המחזור</h3>
+		<div id="mobile_book_pages">
+			<?php print  '';?>
+		</div>
+	<?php  endif;?>
+	
 	<h3>פספורטים מלייף בוק</h3>
 	<div id="lifebook_passport">
-		---
+			<?php print render($field_lifebook_passport);?>
+
 	</div>
 	
 	<h3>תמונות מלייף בוק</h3>
-	<div id="lifebook_passport">
-		---
+	<div id="lifebook_images">
+			<?php print render($field_lifebook_images);?>
 	</div>
 	
 

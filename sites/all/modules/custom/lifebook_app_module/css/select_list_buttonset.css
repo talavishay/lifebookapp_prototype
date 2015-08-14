@@ -1,0 +1,34 @@
+.radio_to_buttonsetv {
+    display: block;
+    float: left;
+    position: relative;
+    z-index: 9;
+}
+.radio_to_buttonsetv .ui-button:not(.selected),
+/*
+.radio_to_buttonsetv .ui-button:not(.selected):not(.ui-state-active),
+*/
+.radio_to_buttonsetv button:not(.selected)
+.radio_to_buttonsetv.active button:first-child:not(.selected) {
+ 	display: none; 
+}
+.radio_to_buttonsetv:not(.active) button:first-child ,
+.radio_to_buttonsetv.show .ui-state-default ,
+.radio_to_buttonsetv.show button {
+		display: block ;
+}      
+.radio_to_buttonsetv.show {	
+	max-height: none;	
+}
+.radio_to_buttonsetv .selected{
+    background: aqua;
+    transition-duration: 2s;
+    	display: block ;
+}
+#chapters .selected{
+    background: midnightblue;
+    color: white;
+}
+.reloading{
+display:none !important;
+}

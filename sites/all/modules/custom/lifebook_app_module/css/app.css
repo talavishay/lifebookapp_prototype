@@ -1,3 +1,23 @@
+.page-app.admin-menu #admin-menu{
+	display: none;
+}
+.page-app.admin-menu{
+	margin-top: 0px !important;
+	padding-top: 0px !important;
+}
+#top_tools{
+/* 	z-index: 10; */
+	position: relative;
+}
+/* .sidebar.toggling, */
+.sidebar{
+position: relative;
+/* 	transform-origin: left top;
+transform: rotateX(0deg) rotateY(60deg) translateY(-7px);
+transform-style: preserve-3d;
+backface-visibility: hidden; */
+/* z-index: 0; */
+}
 /*
 .student_add_to_page
 */
@@ -25,7 +45,10 @@ sidebar first #START
 	vertical-align: top;
 }
 .students_list .form label{
+/*
 display: inline;
+*/
+font-size: 68%;
 }
 .students_list .form .form-item	{	
 	white-space: nowrap	;
@@ -37,15 +60,177 @@ display: none;
 .preview_canvas img{
 margin:0 10px;
 }
-.widget >  [type=submit]{
-  position:absolute;
-  bottom:0px; 
-  right:0px;
-  width:10px
-}
+.field-type-image .widget{
+    overflow: hidden;
+    display: block;
+    width: 45%;
+    float: right;
+    font-size: 0.455em;
+    border: 0.1em solid #808080;
+    margin: 0.4em;
+    border-radius: 4px 4px 0px 0px;
 
+}
+.field-type-image .widget > div{
+	padding: 0 .5em;
+	overflow: hidden;
+	width: 65%;
+}
+.field-type-image .widget > div  *{
+  white-space: nowrap;
+	line-height: 1em;
+/* 	display: block; */
+}
+.field-type-image [type=submit][name*=remove]{
+/z-index: 99;
+width: 1.2em;
+height: 1.2em;
+display: inline-block;
+position: absolute;
+left: 0px;
+}
+.field-type-image img{
+	width: 100%;
+	height: auto;
+}
+.field-type-image .file-icon{
+	display: none;
+}
 .widget {
   position:relative;
-  border: 1px solid red;
-  display: inline-block;
+}
+.reload{
+	background-color : #444;
+}
+.reload > *{
+	display:none;
+}
+.sidebar.region .block__title {
+    display: none !important;
+}
+
+.toggle {
+width:20%;
+}
+.toggle h3{
+	font-size:0em;
+	color: transparent;
+}
+.region-sidebar-first .toggle.left {
+	float: left;	
+}
+.region-sidebar-first .toggle.right {
+	float: right;	
+}
+.region-sidebar-first .toggle.left {
+	background-image: url('/sites/all/themes/custom/lifebook_app/images/custom/toggle_sidebar_left.png');
+	width: 26px;
+	height: 32px;
+	float: right;
+	position: relative;
+	right: -23.5px;
+	text-align: center;
+}
+.region-sidebar-second .toggle.right {
+background-image: url("/sites/all/themes/custom/lifebook_app/images/custom/toggle_sidebar_right.png");
+	height: 32px;
+	width: 26px;
+	float: left;
+	position: relative;
+	left: -23.5px;
+text-align: center;
+}
+
+html,
+body{
+	direction: rtl;
+	background-color: #4F90C8;
+}
+#content{
+		background-color: #FFFFFF;
+	text-align: center;
+}
+#main{
+		padding: auto 0.1em;
+}
+.header__logo-image {
+    max-width: 130px;
+}
+.ui-dialog .ui-dialog-titlebar ,
+.ui-accordion > h3,
+.block-lifebook-app-module  .ui-accordion,
+.block-lifebook-app-module .ui-accordion-content,
+.ui-dialog.fabric_tools .ui-accordion,
+.ui-dialog.fabric_tools .ui-accordion-content{
+    padding: 0px 3px ;
+}
+.ui-accordion .ui-accordion-header {
+/* .ui-accordion .ui-accordion-content { */
+padding: 0em 1em ;
+	line-height: 1.4em;
+	
+margin: 0em;	
+}
+.header__logo{
+	position: absolute;
+	margin: 0px;
+	padding: 0px;
+	background-color: white;
+	padding-right: 20px;
+	border-radius: 0 0 15px 0;
+	padding-left: 20px;
+	left: 0px;
+	top: 0px;
+}
+.student_add_to_page .ui-widget-content{
+	display:none;
+}
+
+#project_dates{
+	width	:	13em;
+}
+#project_nav{
+	
+/* 	width	:	15.5em;; */
+}
+
+#user_info a:after{
+	display: 	block;
+	content: "";
+	background: red;
+	
+}
+html:not(.mobile) body{
+
+  background-color: #4F90C8;
+  background-repeat: no-repeat;
+/*   background-image: url('lifebook_design/main-2.JPG'); */
+  background-size: 100% !important;
+  padding:0px;
+  margin:0px;
+}
+
+html.colors	 body{
+/*   background-image: url('lifebook_design/colors.jpg'); */
+
+}
+
+html.tablet	 body{
+/*   background-image: url('lifebook_design/desktop/right/פספורטים מלייףבוק.JPG'); */
+/*
+background-position: -360px 0;
+*/
+	
+}
+html.mobile	 body{
+/* background-image: url("lifebook_design/mobile/העלאת תמונות.JPG"); */
+background-repeat: no-repeat;
+background-size: 152%;
+background-position: 50% 128%;
+	
+}
+
+
+#block-lifebook-app-module-lifebook-header .block__title {
+    display: none;
 }

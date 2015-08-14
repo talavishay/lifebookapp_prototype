@@ -1,6 +1,6 @@
 type,title,first_name,last_name
-book,מקיף ג - קרית ארבע
-chapter,כיתה ח1
+book,מקיף ג - חולון
+chapter,ג5
 page,דף 1
 page,דף 2
 page,דף 3 
@@ -11,4 +11,14 @@ student,איציק,איציק,cohen
 student,משה,משה,cohen
 student,אלישבע,אלישבע,cohen
 student,אייל,אייל,cohen
-
+chapter,ג2
+page,דף 1
+page,דף 2
+page,דף 3 
+page,דף 4
+page,דף 5
+student,אלי,אלי,cohen
+student,איציק,איציק,cohen
+student,משה,משה,cohen
+student,אלישבע,אלישבע,cohen
+student,אייל,אייל,cohen

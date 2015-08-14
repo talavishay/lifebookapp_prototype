@@ -1,4 +1,5 @@
 <?php 	
+
 print render($active_page); 
 ?>
 <hr/>

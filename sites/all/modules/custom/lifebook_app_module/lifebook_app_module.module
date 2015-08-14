@@ -8,17 +8,17 @@ function lifebook_app_module_css_alter(&$css) {
 }
 function lifebook_app_module_menu() {
   $menu = array();
-  $menu['testt'] = array(
+  $menu['_app/get/data'] = array(
     //'title' => 'app',
     'page callback' => "test_callback",
     'access callback' => 'lifebook_app_page_access',
-  	'file' => 'lifebook_app_module.pages.inc',
+  	'file' => 'includes/lifebook_app_module.rest_callback.inc',
   );
   $menu['app/%/%'] = array(
     //'title' => 'app',
     'page callback' => 'lifebook_app_callback',
     'access callback' => 'lifebook_app_page_access',
-    'file' => 'lifebook_app_module.pages.inc',
+    'file' => 'includes/lifebook_app_module.pages.inc',
     'page arguments' => array(1,2),
     //'type' => MENU_CALLBACK,
     'weight' => 0,
@@ -28,7 +28,7 @@ function lifebook_app_module_menu() {
     //'title' => 'app',
     'page callback' => 'lifebook_app_update_student',
     'access callback' => 'lifebook_app_page_access',
-    'file' => 'lifebook_app_module.pages.inc',
+    'file' => 'includes/lifebook_app_module.pages.inc',
     'page arguments' => array(1,2),
     //'type' => MENU_CALLBACK,
     'weight' => 0,
@@ -39,7 +39,7 @@ function lifebook_app_module_menu() {
   		'delivery callback' => 'ajax_deliver',
   		'page arguments' => array(1),
   		'access callback' => 'lifebook_app_page_access',
-  		'file' => 'lifebook_app_module.pages.inc',
+  		'file' => 'includes/lifebook_app_module.pages.inc',
   		'type' => MENU_CALLBACK,
   		'weight' => 0,
   );
@@ -47,6 +47,13 @@ function lifebook_app_module_menu() {
 }
 function lifebook_app_page_access() {
   return TRUE;
+}
+function lifebook_app_module_page_alter(&$page){
+	global $lifebook;
+	$dm = $lifebook["display_mode"];
+	if($dm ){
+		//unset
+	};
 }
 function lifebook_app_module_theme(){
 	return array(
@@ -91,7 +98,8 @@ function lifebook_app_module_theme(){
 		//'template' => 'select_class',
 		'render element' => 'element',
 		'variables' => array(
-				'list' => array(t('Option 1'),t('Option 2') )
+				'list' => array(t('Option 1'),t('Option 2') ),
+				'id' => 'xxx'
 		),
 		'file' => 'lifebook_app_module.theme.inc'
 			
@@ -143,24 +151,31 @@ function lifebook_app_module_block_info() {
   return $blocks;
 }
 function lifebook_app_module_block_view($delta = '') {
-	global $user;	
+	
+	global $user,$lifebook;
+	$dm = 	$lifebook["display_mode"];
 	$block = array();
 	if ($user->uid !== 0 ) {
 		switch ($delta) {
 			case 'lifebook_header':
 				$block['content'] = array(
 						'#theme' => 'lifebook_header',
+						'title' =>'<none>'
 				);
 			break;
 			case 'lifebook_app_class_preview':
-				$block['content'] = array(
-						'#theme' => 'lifebook_class_preview',			
-				);
+				if($dm != "mobile"){
+					$block['content'] = array(
+							'#theme' => 'lifebook_class_preview',			
+					);
+				};
 			break;
 			case 'lifebook_app_content':
-				$block['content'] = array(
-						'#theme' => 'lifebook_sidebar_first',
-				);
+				if($dm != "mobile"){
+					$block['content'] = array(
+							'#theme' => 'lifebook_sidebar_first',
+					);
+				};
 			break;
 			case 'lifebook_app_tools':
 				$block['content'] = array(
@@ -187,7 +202,7 @@ function lifebook_app_canvas_preview($entity){
 	);
 	return $ra;
 }
-function _get_student_info($s) {
+/* function _get_student_info($s) {
 	$dis = array(
 			'settings' => array('image_style' => 'student_list_preview'),
 			'label' => 'hidden'
@@ -205,6 +220,30 @@ function _get_student_info($s) {
 		$out["passport"]  = field_view_value("project", $s, 'field_passport', $s->field_passport["und"][0], $dis );
 	}
 	return $out;
+} */
+function _get_student_info($s) {
+	$emw =  entity_metadata_wrapper("project", $s);
+	$display = array(
+			'settings' => array('image_style' => 'student_list_preview'),
+	);
+	$out = array(
+			"id"=> $emw->getIdentifier(),
+			"first_name"=> $emw->field_first_name->raw(),
+			"last_name"	=> $emw->field_last_name->raw(),
+			"text"	=> $emw->field_text->raw(),
+			"page" 		=> $emw->field_page->raw()
+	);
+
+	if(gettype($emw->field_group_picture->raw()) == 'array'){
+		$out["group_picture"]  = _emw_field($emw, "field_group_picture", $display);
+	}
+ 	if(gettype($emw->field_passport->raw()) == 'array'){
+		$out["passport"]  = _emw_field($emw, 'field_passport', $display);
+	} 
+	return $out;
+}
+function _emw_field($emw, $name, $dis){
+	return field_view_value("project", $emw->raw(), $name, $emw->$name->raw(), $dis );
 }
 function _get_students_list($param, $form=true) {
 	foreach ($param as $k => $v){
@@ -273,11 +312,15 @@ function partial_fields_form_ajax_callback($form, &$form_state) {
 			'#type' => 'ajax',
 			'#commands' => $commands,
 	);
-}
+};
 function _class_pictures_form_theme($form){
 	$form['field_image_form']["field_image"]["und"]["#theme"] = "file_widget_multiple_override";
 	$form['field_image_form']["field_image"]["und"]["#theme_wrappers"] = array();
-	return $form;
+	$form['field_lifebook_passport_form']["field_lifebook_passport"]["und"]["#theme"] = "file_widget_multiple_override";
+	$form['field_lifebook_passport_form']["field_lifebook_passport"]["und"]["#theme_wrappers"] = array();
+	$form['field_lifebook_images_form']["field_lifebook_images"]["und"]["#theme"] = "file_widget_multiple_override";
+	$form['field_lifebook_images_form']["field_lifebook_images"]["und"]["#theme_wrappers"] = array();
+	return $form; 
 }
 function _attach_field($field_name, $entity_type, $entity_bundle, $entity, &$form, &$form_state){
 	$form['#parents'] = array();// we need to add this empty array, or we will get an ugly error
@@ -312,6 +355,7 @@ function _student_form_callback($param) {
 	$commands = array();
 	$commands[] =	ajax_command_replace("#".$param["#build_id"], drupal_render($param));
 	$commands[] =	ajax_command_replace('.student[data-student_id="'.$student["id"].'"] .preview  .first_name', $first_name );
+	$commands[] =	ajax_command_replace('.student[data-student_id="'.$student["id"].'"] .preview  .last_name', $last_name );
 	$commands[] =	ajax_command_replace('.student[data-student_id="'.$student["id"].'"] .preview  .last_name', $last_name );
 	$commands[] =	array(
     	'command' => 'update_student',

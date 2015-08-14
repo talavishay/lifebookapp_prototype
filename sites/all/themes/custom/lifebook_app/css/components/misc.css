@@ -80,16 +80,25 @@
  * Branding header.
  */
 
+.header__logo {
+	top : 3px;
+}
 /* Wrapping link for logo. */
 .header__logo {
-  float: left; /* LTR */
-  margin: 0;
-  padding: 0;
+ position: absolute;
+margin: 0px;
+padding: 10px 20px 0px;
+background-color: #FFF;
+border-radius: 0px 0px 15px;
+left: 3px;
+top: 3px;
+height: 30px;
 }
 
 /* Logo image. */
 .header__logo-image {
-  vertical-align: bottom;
+  height: 1.9em;
+  vertical-align: bottom; 
 }
 
 /* Wrapper for website name and slogan. */
@@ -101,7 +110,9 @@
 .header__site-name {
   margin: 0;
   font-size: 2em;
+/*
   line-height: 1.5em;
+*/
 }
 
 /* The link around the name of the website. */
@@ -439,7 +450,7 @@ span.field-label {
 
 /* Block wrapper. */
 .block {
-  margin-bottom: 1.5em;
+/*   margin-bottom: 1.5em; */
 }
 
 /**
@@ -538,9 +549,9 @@ span.field-label {
  * Forms.
  */
 
-/* Wrapper for a form element (or group of form elements) and its label. */
+/* Wrapper for a form element (or group of form elements) and its label. 
 .form-item {
-  margin: 1.5em 0;
+  margin: 0;
 }
 
 /* Pack groups of checkboxes and radio buttons closer together. */
@@ -755,4 +766,7 @@ tr.selected td {
 .progress .filled {
   background-color: #0072b9;
   background-image: url('../../images/progress.gif');
+}
+.mobile .admin-menu #page {
+/*     margin-top: 35px; */
 }

@@ -25,11 +25,10 @@ Drupal.settings.lifebook._setup = function(){
 	};
 }
 Drupal.settings.lifebook.student_add_to_page = function(data){
-	var text = '';
-	jQuery.each(["first_name","last_name"], function(i, val){
-			text += data[val] + " ";
-		});
-	text += "\n" + data["text"];		
+	var text =  data["first_name"] + " " + "last_name";
+	if(data["text"] != ""){
+		text += "\n" + data["text"];
+	}
 	var obj = add_text(text);
 	obj.lifebook_type = "student";
 	obj.lifebook_data = {student_id: data.id};
@@ -51,43 +50,8 @@ Drupal.settings.lifebook._update_student_page = function(data, del){
 			}
 			elm.find(".page").html(page);
 				_save();
-
 	});
 };
-Drupal.settings.lifebook._get_student = function(val){
-	var student = jQuery('<div class="student"/>'),
-	preview = jQuery('<div class="preview"/>'),
-	first_name = jQuery('<span class="first_name"/>'),
-	last_name = jQuery('<span class="last_name"/>');
-	page = jQuery('<span class="page"/>'),
-	page_id = parseInt(val.page),
-	f = first_name.clone().html(val.first_name+" "),
-	l = last_name.clone().html(val.last_name),
-	p = page.clone().html(page_id),
-	item = student.clone().append(preview.clone().append(f).append(l).append(p));
-	
-	//if(typeof val.page.und !== "undefined"){
-		//page_id = val.page.und[0].target_id;
-	//}	
-	if(typeof page_id === "number" && !isNaN(page_id)){
-		item.addClass("on_page");
-	}
-	item.attr("data-student_id", val.id);
-	item[0].student_id = val.id;
-	
-	item.one("click", function(e){
-		var x = Drupal.settings.lifebook.students_list;
-		 d = jQuery.map(x, function(item){
-			if(item.id === e.currentTarget.student_id){
-				return item;
-			}
-		});
-		jQuery(e.currentTarget).addClass("on_page");
-		
-		Drupal.settings.lifebook.student_add_to_page(d[0]);
-	});
-	return item;
-}
 
 Drupal.settings.lifebook._init = function(){
 	
@@ -96,29 +60,89 @@ Drupal.settings.lifebook._init = function(){
 		heightStyle: "content"
 	});
 	
+	
 	var list = jQuery('<div/>');
 	Drupal.settings.lifebook.students_list.forEach(function(val){
 		list.append(Drupal.settings.lifebook._get_student(val));
 	});
+	
+	var dm  = Drupal.settings.lifebook.display_mode;
+	if(dm === "mobile"){
+		var target = "#lifebook_mobile_content ";
+		
+		//jQuery(taregt).html(list);
+		
+		
+		jQuery(target).html(jQuery('<button class="popup">student_add_to_page</button>')
+		.on('click', function(e){
+			var position = {
+				my: "center top",
+				at: "center center",
+				of: target,
+			};			
+			jQuery(list).dialog({
+				dialogClass	: "student_add_to_page",
+				title		:"הוסף טקסט של תלמיד לעמוד זה",
+				width		:150,
+				position : position	,
+				open: function( event, ui ) {
+					var dialog_content = this;
+					jQuery(dialog_content).toggle();
 
-	jQuery(list).dialog({
-		dialogClass	: "student_add_to_page",
-		title		:"הוסף טקסט של תלמיד לעמוד זה",
-		width		:150,
-		position 	: {
-				at :"right top",
-				my :"left top",
-				//within: ".fabric_canvas_view_field"
-				of: ".fabric_canvas_view_field",
-				collision: "none"
-		}
-	});
+				}
+			});
+		}));
+	} else {
+		var target = ".fabric_canvas_view_field",
+			position =  {
+			at :"right top+100",
+			my :"left top",
+			of: target
+		};
+					
+		jQuery(list).dialog({
+				dialogClass	: "student_add_to_page",
+				title		:"הוסף טקסט של תלמיד לעמוד זה",
+				width		:150,
+				position : position	,
+				open: function( event, ui ) {
+					var dialog_content = this;
+					jQuery(dialog_content).toggle();
+
+				}
+			});
+	}
 	
 };
 
-Drupal.settings.lifebook._setup();	
-Drupal.settings.lifebook._init();
 
 
+
+	//(function( $ ){
+	/**
+	 *  init  project nav
+	 * 
+	 * radios into buttons & event handler
+	 * */
+		var arg = window.location.pathname.split('/'),
+			nav = jQuery("#project_nav .radio_to_buttonsetv" );
+		
+		// project nav event handle	
+		jQuery("button", nav).on("click", function(){
+			var chapter_id	=	jQuery(this).data("id"),
+				book_id		=	jQuery(this).parents('.radio_to_buttonsetv').data("book_id"),
+				url 		= '/app/'+book_id+'/'+chapter_id;
+			
+			if( chapter_id != arg[3] ){
+				window.location.href = url;
+			};
+		});
+		
+		//activate current project nav
+		jQuery('button[data-id="'+arg[3]+'"]', nav).addClass('selected');
+		jQuery(nav).addClass("active");
+		
+		
+	//});
 
 });

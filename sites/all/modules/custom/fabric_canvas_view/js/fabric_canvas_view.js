@@ -254,27 +254,43 @@ function add_tools(canvas){
 	//jQuery("body").append(colorpicker);
 	
 	general.addClass("tools")
-		.append(selectSLider("opacity", get_select("opacity", 1, 100)))
-		.append(selectSLider("scale", get_select("scale", 1, 100)))
-		.append(jQuery('<div/>').css("display", "block")
+		.append(jQuery('<button  id="save">שמור</button>'))
+		.append(jQuery('<button  id="order">הזמן</button>'))
+		.append(jQuery('<button  id="save">ששתף חברים</button>'))
+		.append(jQuery('<button  id="print">הדפס אלבום</button>'))
+		.append(jQuery('<button  id="preview">תצוגה מתאימה</button>'))
+		.append(jQuery('<button  id="fullscreen">מסך מלא</button>'))
+		.append(jQuery('<button  id="zoom">הגדלה</button>'))
+		.append(jQuery('<button  id="grid">רשת</button>'))
+		.append(jQuery('<button  id="qr">QR code</button>'))
+		.append(jQuery('<button  id="rotate">סיבוב 90 תצוגת עמוד</button>'))
+		.append(jQuery('<button  id="size">שינוי גודל עמוד</button>'))
+		.append(jQuery('<button  id="cover">שינוי סוג כריכה</button>'))
+		.append(jQuery('<button id="mobile">גרסת מובייל</button>'))
+		.append(jQuery('<button id="help">עזרה</button>').addClass("ui-icon-trash"))
+		//.append(jQuery('<button id="clear">clear</button>').addClass("ui-icon-trash"))
+		//.append(jQuery('<button id="delete">X</button>').addClass("ui-icon-trash"))
+		//.append(jQuery('<button id="elmUp">up</button>'))
+		//.append(jQuery('<button id="elmDown">down</button>'))
+		//.append(jQuery('<button id="clip">clip</button>'))
+//		.append(jQuery('<button id="reload">reload</button>'))
+		//.append(jQuery('<button class="draw">draw</button>'))
+		//.append(jQuery('<button data-toggle="off" class="color"><span class="color">color</span></button>')) //farbtastic
+		//.append(jQuery('<button data-toggle="off" class="color_grad"><span class="color_gradeint_preview">GRAD</span></button>'))
+		//.append(jQuery('<button class="scaleY">scaleY</button>'))
+		//.append(jQuery('<button class="scaleX">scaleX</button>'))
+		//.append(jQuery('<button class="rotate">rotate</button>'))
+		//.append(jQuery('<button class="shadow">shadow</button>'))
+		.append(jQuery('<div/>')
+			.append(selectSLider("opacity", get_select("opacity", 1, 100)))
+			.append(selectSLider("scale", get_select("scale", 1, 100)))
+			.append(jQuery('<div/>').css("display", "block"))
 			.append(jQuery('<input type="file" multiple id="input" >'))
 			//.append(jQuery('<input type="checkbox"  >'))
 			.append(jQuery('<button id="uploadBtn">uploadBtn</button>').addClass("ui-icon-trash"))
-		)		
-		.append(jQuery('<button id="clear">clear</button>').addClass("ui-icon-trash"))
-		.append(jQuery('<button id="delete">X</button>').addClass("ui-icon-trash"))
-		.append(jQuery('<button id="elmUp">up</button>'))
-		.append(jQuery('<button id="elmDown">down</button>'))
-		.append(jQuery('<button id="clip">clip</button>'))
-//		.append(jQuery('<button id="reload">reload</button>'))
-		.append(jQuery('<button class="draw">draw</button>'))
-		.append(jQuery('<button data-toggle="off" class="color"><span class="color">color</span></button>')) //farbtastic
-		.append(jQuery('<button data-toggle="off" class="color_grad"><span class="color_gradeint_preview">GRAD</span></button>'))
-		.append(jQuery('<button  id="save">save</button>'))
-		.append(jQuery('<button class="scaleY">scaleY</button>'))
-		.append(jQuery('<button class="scaleX">scaleX</button>'))
-		.append(jQuery('<button class="rotate">rotate</button>'))
-		.append(jQuery('<button class="shadow">shadow</button>'));
+		);
+		
+
 
 
 	text
@@ -335,11 +351,26 @@ function add_tools(canvas){
 	
 	//var color_gradeint_tool = _color_gradeint_tool();
 	//color_gradeint_tool.dialog();
+	jQuery('#header')
+		.after(jQuery('<div id="top_tools"/>')
+			.append(jQuery("button", wrap_g)));
+	jQuery("#top_tools button").button({
+		//text:false,
+		icons: {
+            secondary: "ui-icon-blank"   // Custom icon
+        }		
+	}).removeClass('ui-corner-all');
 	
+	//jQuery("#top_tools button").removeClass('ui-corner-all');
+	//jQuery("#top_tools button#save").button({
+		//icons: {
+            //primary: "ui-icon-blank"   // Custom icon
+        //}
+	//});
 	//setup jqueryui accordion structure
 	wrap
-		.append('<h3>general</h3>')
-		.append(wrap_g)
+		//.append('<h3>general</h3>')
+		//.append(wrap_g)
 		.append('<h3>bacckground</h3>')
 		.append(bacckground)
 		.append('<h3>text</h3>')
@@ -354,7 +385,7 @@ function add_tools(canvas){
 		.append(borders);
 	
 	//bind_tools(general);
-	jQuery("button", wrap_g).button({text:false});
+	
 	
 	jQuery( wrap).accordion({
 		collapsible: true,
@@ -365,8 +396,8 @@ function add_tools(canvas){
 		dialogClass : "fabric_tools",
 		title: "tools",
 		resizable: false ,
-		position : { 	my : "right top+50",
-						at : "right top",
+		position : { 	my : "right bottom",
+						at : "right bottom",
 						of	:	window
 		},
 		create: function( event, ui ) {
@@ -384,6 +415,11 @@ function add_tools(canvas){
 			jQuery('.ui-accordion-header[tabindex="0"]', this).click();
 			window.setTimeout(function(){
 				jQuery('#minimize_dialog', dialog).trigger("click");
+				dialog.position({
+						my : "right bottom",
+						at : "right bottom",
+						of	:	window
+				});
 			},0);
 			
 		},
@@ -803,6 +839,7 @@ function add_text(data , type){
 	var data = typeof data === "undefined" ? 'hello world': data;
 	
 	var text = new fabric.IText(data, { 
+	//var text = new fabric.Text(data, { 
 		textAlign: "right",
 		left: 100, 
 		top: 100,
@@ -933,12 +970,12 @@ function add_image(img, target){
 	
 	img.angle = 20*_rand();
 	
-	img.scaleToWidth(canvas.width*.6);
-	img.setShadow({ color: 'canvas_jsona(0,0,0,1)' });
+	//img.scaleToWidth(canvas.width*.6);
+	//img.setShadow({ color: 'canvas_jsona(0,0,0,1)' });
 	canvas.add(img);
-	_active_rand_positioning(img);
-	img.setCoords();
-	canvas.setActiveObject(img);
+	//_active_rand_positioning(img);
+	//img.setCoords();
+	//canvas.setActiveObject(img);
 
 }
 

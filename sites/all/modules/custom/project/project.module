@@ -9,6 +9,15 @@
  */
 function project_menu() {
   $items = array();
+  $items['project/select/%/%/%'] = array(
+  		'page callback' => 'project_get_select',
+		'delivery callback' => 'ajax_deliver',
+  		'page arguments' => array(2,3,4),
+  		'access callback' => 'project_access',
+  		'access arguments' => array('view all'),
+  		'file' => 'includes/project.pages.inc',
+  		'type' => MENU_CALLBACK,
+  );
   $items['project'] = array(
     'title' => 'View all Projects',
     'page callback' => 'project_view_all',
@@ -371,7 +380,7 @@ function project_save($project, $type = "") {
 			$handle = fopen($tmp_file , 'r');
 					
 			if($handle && filesize($tmp_file)){
-				$file = file_save_data($handle, 'public://field_canvas_preview/'.$name);
+				$file = file_save_data($handle, 'public://'.$name);
 				
 				$wrapper = entity_metadata_wrapper('project', $project->id);
 				$wrapper->field_canvas_preview = array('fid' => $file->fid);
@@ -392,9 +401,9 @@ function _exec($data, $tmp_file){
 	
 	return $PHPNodeJS->run('
     var fs = require("fs"),
-    fabric = require("/usr/local/lib/node_modules/fabric").fabric,
+	//    fabric = require("/usr/local/lib/node_modules/fabric").fabric,
+    fabric = require("fabric").fabric,
     out = fs.createWriteStream("'.$tmp_file.'", {mode:0777});
-	
 var canvas = fabric.createCanvasForNode(200, 200);
 var data = '.$data.';
 canvas.loadFromJSON(data, function() {

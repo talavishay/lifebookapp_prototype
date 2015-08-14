@@ -6,16 +6,13 @@
 'due_date' => '01.01.1983', */
 ?>
 <span id="user_info">
-	<a href="/user/logout"><?php print t('logout')?></a>
-	<span >hello <?php print $user_name?></span>
+	<a href="/user/logout"><?php print t('login / logout')?></a>
+	<span><?php print t('hello').' '.$user_name?></span>
 </span>
 <span id="project_nav">
-	<span class="class">
-		<span>class </span>
-		<span class="class_name"><?php print render($class_name)?></span>
-	</span>
+	<button class="school"><?php print $school_name?></button>
 	<span class="sep">></span>
-	<span class="school"><?php print $school_name?></span>
+	<?php print render($class_name)?>
 </span>
 <span id="project_dates">
 	<span class="label"><?php print t('due date');?>: </span>

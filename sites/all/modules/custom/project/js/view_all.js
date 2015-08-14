@@ -1,31 +1,26 @@
+
+(function( $ ){
+//plugin buttonset vertical
+$.fn.buttonsetv = function() {
+$(':radio, :checkbox', this).wrap('<div style="margin: 1px"/>');
+$(this).buttonset();
+$('label:first', this).removeClass('ui-corner-left').addClass('ui-corner-top');
+$('label:last', this).removeClass('ui-corner-right').addClass('ui-corner-bottom');
+mw = 0; // max witdh
+$('label', this).each(function(index){
+w = $(this).width();
+if (w > mw) mw = w;
+})
+$('label', this).each(function(index){
+$(this).width(mw);
+})
+};
+})( jQuery ); 
+//jQuery(document).ready(function({
+
+
 jQuery(document).ready(function(){
-	book = {
-		types : Drupal.settings.e_types,
-		id : 0,
-		title : "Book title",
-		chapters : [],
-		pages : [],
-		entities : []
-	};
-
-	Drupal.attachBehaviors();
-
-	var input = jQuery('<input  accept="text/csv"  type="file"/>');
-	
-	input.on("change", function(e){
-		Papa.parse( e.target.files[0], {
-			header: true,		 
-			step: _step,
-			//error: function(err){					//console.log(err);				//},
-			dynamicTyping: true			});
-	});
-	jQuery("#project_view_all")
-		.before(input)
-		.append(jQuery('<table id="CSVTable"/>'));
-	if(!book.init){
-		book.init = true;
-		_init_table();		
-	};
+	view_all_init();
 })
 .on("click", '.entity_link', function(e){
 	var d = e.currentTarget.dataset,
@@ -40,6 +35,249 @@ jQuery(document).ready(function(){
 	return false;
 });
 
+function view_all_init(){
+	book = {
+		types : Drupal.settings.e_types,
+		id : 0,
+		title : "Book title",
+		chapters : [],
+		pages : [],
+		entities : []
+	};
+
+	Drupal.attachBehaviors();
+
+	var input = jQuery('<input  accept="text/csv"  type="file"/>');
+	jQuery("#content").after(input);
+	
+	input.on("change", function(e){
+		Papa.parse( e.target.files[0], {
+			header: true,		 
+			step: _step,
+			//error: function(err){					//console.log(err);				//},
+			dynamicTyping: true			
+		});
+		book = {
+			types : Drupal.settings.e_types,
+			id : 0,
+			title : "Book title",
+			chapters : [],
+			pages : [],
+			entities : []
+		};
+	});
+	if(!book.init){
+		book.init = true;
+		_init_table();		
+	};
+	//var entity_bundels = book.entity_bundels;
+	
+	
+	//var bt = jQuery( "#select_list_books input" ).button();
+	//jQuery(".ui-button", bt)[0].click();
+	
+	
+	
+	
+	
+	var bt = jQuery( ".radio_to_buttonsetv#books" );
+	bt.buttonsetv();
+	bt.on("mouseenter", function(){
+		jQuery(this).addClass("show");
+	}).on("mouseleave", function(){
+		jQuery(this).removeClass("show");
+	});
+	
+	 var bt_c = jQuery( bt).children();
+	 bt_c.on("click", function(e){
+		jQuery(bt_c).removeClass("selected");		
+		
+		var buttons = jQuery(this);
+			book_id = this.dataset.id,
+			clicked_btn = this;
+		
+		jQuery('#books').removeClass("show").once().addClass("active");
+			
+		
+		jQuery(e.currentTarget).addClass("selected");
+		jQuery("#chapters").addClass("reloading")
+		
+		_update_chapters(book_id, 'chapters');
+	});
+	
+	//var book_id = jQuery("#books option:visible").val();
+	//_update_chapters(book_id,"chapters");
+	//jQuery("select#chapters").on("change", function(e){
+		
+	//});
+	Drupal.behaviors.lifebook = {
+	  attach: function (context, settings) {
+		
+		if(jQuery( context).hasClass('chapters')){
+			
+			jQuery(context).buttonsetv();
+			jQuery(context).attr('style', 'width:100%;');
+			jQuery(context).addClass("show");
+			//jQuery('button', context).first()
+			var c = context;
+			jQuery("button", context).on("click", function(){
+					jQuery(context).addClass('show');
+				
+					
+					var chapter_id	=	jQuery(this).data("id"),
+						book_id		=	jQuery('#books .selected').data("id");
+					
+					
+					jQuery('button', context).not(this).removeClass("selected");
+					jQuery(this).addClass('selected');
+					
+					
+				});
+					
+			};
+			
+				var bt = jQuery( ".radio_to_buttonsetv#books" ).buttonsetv();
+
+			
+		}
+	};
+
+}
+function _init_table(csv){
+
+	 _table_1 = _jtable();
+	
+	_table_1.before(jQuery('<button/>')
+		.text("list")
+		.data("table_ref" , _table_1)
+		.on('click' , _load_table))
+		.before(jQuery('<button/>')
+		.text('open')
+		.on('click', _load_project));
+}
+
+function _load_project(e){
+	book = jQuery("#books .selected").data('id'),
+	chapter = jQuery("#chapters  .selected").data('id'),
+	window.open('/app/'+book+'/'+chapter, '_blank');
+}
+function _load_table(e){
+	//var table_ref = jQuery(e.currentTarget).data("table_ref"),
+	//type = jQuery("select#type").val(),
+	type = "page",
+	book = jQuery("#books .selected").data('id'),
+	chapter = jQuery("#chapters  .selected").data('id'),
+	//table_ref
+	 _table_1.jtable()
+		.jtable('load',{
+			type: type,
+			chapter: chapter,
+			book: book
+			
+		}, 	function(d){
+			book._table = d;
+		});
+};
+function _jtable(){
+var setDefualtBook, setDefualtChapter,options = {
+	paging : true,
+	pageSize: 5,
+	deleteConfirmation : false,
+	selecting: true, //Enable selecting
+	multiselect: true, //Allow multiple selecting
+	selectingCheckboxes: true, //Show checkboxes on first column
+	//selectOnRowClick: false, //Enable this to only select using checkboxes
+	selectionChanged: function () {		//Get all selected rows
+		var selectedRows = jQuery('#content').jtable('selectedRows');
+			
+		if (selectedRows.length > 0) {
+			// selected rows
+			selectedRows.each(function (i,val) {
+				selectedRows[i].record = jQuery(this).data('record');
+					
+				//jQuery(this).data("select", val);
+				
+				confirm({
+						title : "בחר פעולה",
+						content : selectedRows[i].record,
+						type : jQuery("td", this).first().text(),
+					}, 
+					[{	label : "setDefualtBook",
+						action : setDefualtBook,
+						data : selectedRows[i].record
+					},{
+						action :setDefualtChapter,
+						data : selectedRows[i].record,
+						label : "setDefualtChapter",
+					}]);
+			});
+		}
+	},
+		//rowInserted: function (event, data) {
+////			if (data.record.Name.indexOf('Andrew') >= 0) {
+				//jQuery('#content').jtable('selectRows', data.row);
+	////		}
+		//}  
+	actions: {
+		//listAction:  function (postData) {
+			//var res = { "Result":"OK", "Record": {} };
+			//postData.split('&').forEach(function(v){ 
+				//var _split = v.split('=');
+				//res.Record[_split[0]] = _split[1]+"XXXX";
+			//});
+			//return res;
+		//},
+		listAction: '/project/jtable/list',
+		createAction: '/project/jtable/create',
+	//	updateAction: '/GettingStarted/UpdatePerson',
+		deleteAction: '/project/jtable/delete'
+	},
+	fields: {
+		id: {
+			title: 'מזהה',
+			//display: function (d) {
+				//return  _entity_link(d, false);
+			//},
+			key: true,
+		},
+		title: {
+			 title: 'כותרת',
+			//edit: true,
+			width: '50%'
+		},
+		rid:{visibility : "hidden"},
+		id2: {
+			 title: 'מזהה כיתה',
+			//display: function (d) {
+				//return  _entity_link(d, true);
+			//}	
+		},
+		type: {
+		    title: 'סוג',
+		    options: { 
+				'book': 'ספר', 
+				'chapter': 'כיתה',
+				'page': 'דף' ,
+				'student': 'תלמיד' 
+			},
+		},
+	}
+	};
+	setDefualtBook = function(d){	
+		console.log(d.data.id);
+		book.id = d.data.id;
+		jQuery("<div>default book is now : "+d.data.id+"</div>").dialog();
+	};
+	setDefualtChapter = function(d){
+		console.log("action on record  : ");
+		console.log(d);
+	};
+	
+	// initialize jtable plugin with above options..
+	_table = jQuery('#main').after(jQuery('<div/>').jtable(options));
+	return _table;
+}
+
 function _step(results, parser){
 	var row = results.data[0];
 	parser.pause();
@@ -49,22 +287,7 @@ function _step(results, parser){
 		_add_row(row, parser);	
 	}
 }
-function _init_table(csv){
-	_jtable();
-	
-	var control = jQuery('<button/>').text("list").on('click' , function(){
-			var entity_bundels = book.entity_bundels;
 
-			_table
-				.jtable('load',{
-					type: jQuery("#project_view_all select").val()
-					
-				}, 	function(d){
-					book._table = d;
-				});			
-	});
-	_table.before(control);
-};
 //function confirm(info, action1, action2, dialogTitle) {
 function confirm(info, actions) {
 	var o = {};
@@ -140,7 +363,8 @@ function _add_entity(e){
 	
 }
 function _entity_setup(e, created){
-	var	entity = jQuery.merge(e,{});
+	var	entity = jQuery.merge(e,{}),
+		chapter_count = book.chapters.length - 1;
 	delete entity.length;
 	
 	if(book.id){
@@ -153,10 +377,10 @@ function _entity_setup(e, created){
 	};
 	if(book.chapters[0]){
 		if(e.type == "page"){
-			entity.og_group_chapter_ref = { "und" : { target_id : book.chapters[0].id }} ;
+			entity.og_group_chapter_ref = { "und" : { target_id : book.chapters[chapter_count].id }} ;
 		};
 		if(e.type == "student"){
-			entity.og_group_student_chapter_ref = { "und" : { target_id : book.chapters[0].id }} ;
+			entity.og_group_student_chapter_ref = { "und" : { target_id : book.chapters[chapter_count].id }} ;
 		};
 	} else {
 				//_confirm_dialog('האם?',null,null,'שאלה');
@@ -170,104 +394,6 @@ function after_step(data){
 		book.id = data.id;
 	};
 };
-
-function _jtable(){
-var setDefualtBook, setDefualtChapter,options = {
-	paging : true,
-	pageSize: 5,
-	deleteConfirmation : false,
-	selecting: true, //Enable selecting
-	multiselect: true, //Allow multiple selecting
-	selectingCheckboxes: true, //Show checkboxes on first column
-	//selectOnRowClick: false, //Enable this to only select using checkboxes
-	selectionChanged: function () {		//Get all selected rows
-		var selectedRows = jQuery('#content').jtable('selectedRows');
-			
-		if (selectedRows.length > 0) {
-			// selected rows
-			selectedRows.each(function (i,val) {
-				selectedRows[i].record = jQuery(this).data('record');
-					
-				//jQuery(this).data("select", val);
-				
-				confirm({
-						title : "בחר פעולה",
-						content : selectedRows[i].record,
-						type : jQuery("td", this).first().text(),
-					}, 
-					[{	label : "setDefualtBook",
-						action : setDefualtBook,
-						data : selectedRows[i].record
-					},{
-						action :setDefualtChapter,
-						data : selectedRows[i].record,
-						label : "setDefualtChapter",
-					}]);
-			});
-		}
-	},
-		//rowInserted: function (event, data) {
-////			if (data.record.Name.indexOf('Andrew') >= 0) {
-				//jQuery('#content').jtable('selectRows', data.row);
-	////		}
-		//}  
-	actions: {
-		listAction:  function (postData) {
-			var res = { "Result":"OK", "Record": {} };
-			postData.split('&').forEach(function(v){ 
-				var _split = v.split('=');
-				res.Record[_split[0]] = _split[1]+"XXXX";
-			});
-			return res;
-		},
-		listAction: '/project/jtable/list',
-		createAction: '/project/jtable/create',
-	//	updateAction: '/GettingStarted/UpdatePerson',
-		deleteAction: '/project/jtable/delete'
-	},
-	fields: {
-		id: {
-			title: 'מזהה',
-			//display: function (d) {
-				//return  _entity_link(d, false);
-			//},
-			key: true,
-		},
-		title: {
-			 title: 'כותרת',
-			//edit: true,
-			width: '50%'
-		},
-		rid:{visibility : "hidden"},
-		id2: {
-			 title: 'מזהה כיתה',
-			//display: function (d) {
-				//return  _entity_link(d, true);
-			//}	
-		},
-		type: {
-		    title: 'סוג',
-		    options: { 
-				'book': 'ספר', 
-				'chapter': 'כיתה',
-				'page': 'דף' ,
-				'student': 'תלמיד' 
-			},
-		},
-	}
-	};
-	setDefualtBook = function(d){	
-		console.log(d.data.id);
-		book.id = d.data.id;
-		jQuery("<div>default book is now : "+d.data.id+"</div>").dialog();
-	};
-	setDefualtChapter = function(d){
-		console.log("action on record  : ");
-		console.log(d);
-	};
-	// initialize jtable plugin with above options..
-	_table = jQuery('#content').jtable(options);
-}
 
 
 function _entity_link(d, ref){
@@ -324,3 +450,67 @@ function _entity_link(d, ref){
   //}
 //};
 //})(jQuery, Drupal, this, this.document);
+
+
+(function($){
+
+  /**
+   * Add an extra function to the Drupal ajax object
+   * which allows us to trigger an ajax response without
+   * an element that triggers it.
+   */
+  Drupal.ajax.prototype.specifiedResponse = function() {
+    var ajax = this;
+
+    // Do not perform another ajax command if one is already in progress.
+    if (ajax.ajaxing) {
+      return false;
+    }
+
+    try {
+      $.ajax(ajax.options);
+    }
+    catch (err) {
+      alert('An error occurred while attempting to process ' + ajax.options.url);
+      return false;
+    }
+
+    return false;
+  };
+
+  /**
+   * Define a custom ajax action not associated with an element.
+   */
+  var custom_settings = {};
+  custom_settings.url = '/project/select/1/z';
+  custom_settings.event = 'onload';
+  custom_settings.keypress = false;
+  custom_settings.prevent = false;
+  //custom_settings.submit= {"id" : "x"};
+  Drupal.ajax['get_select'] = new Drupal.ajax(null, $(document.body), custom_settings);
+
+  /**
+   * Define a point to trigger our custom actions. e.g. on page load.
+   */
+/*  $(document).ready(function() {
+  });*/
+
+})(jQuery);    
+function _get_default_options(){
+	//custom_settings.submit= {"placeholder" :"#chapters"};
+	return {
+		event : 'onload',
+		  keypress : false,
+		  prevent : false
+	}
+}
+
+function _update_chapters(book_id,selector){
+	//var book_id = jQuery("select#books").val(), 
+		//selector = "chapters",
+	  var	obj,
+	  	custom_settings = _get_default_options();
+	custom_settings.url = '/project/select/chapter/'+book_id+'/'+selector;
+	obj = new Drupal.ajax(null, jQuery(document.body), custom_settings);
+	obj.specifiedResponse();
+}

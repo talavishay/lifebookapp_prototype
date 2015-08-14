@@ -17,6 +17,8 @@ scripts
 /profiles/standard
 /profiles/testing
 
+/sites/all/libraries
+
 # core -- root files
 
 .buildpath
@@ -44,3 +46,9 @@ xmlrpc.php
 sites/default/default.settings.php
 sites/example.sites.php
 
+xdebug.log
+yehuda - Copy/
+node*
+grunticon/
+
+sites/all/modules/custom/lifebook_app_module/css/lifebook_design

@@ -18,9 +18,7 @@
 .region-bottom {
   margin-left: auto;
   margin-right: auto;
-/*
   max-width: 1200px;
-*/
 }
 
 /* Apply the shared properties of grid items in a single, efficient ruleset. */
@@ -30,8 +28,8 @@
 .region-sidebar-first,
 .region-sidebar-second,
 #footer {
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   -ms-box-sizing: border-box;
@@ -69,7 +67,7 @@
 @media all and (min-width: 480px) {
   #main {
     /* Move all the children of #main down to make room. */
-/*     padding-top: 3em; */
+    padding-top: 3em;
     position: relative;
   }
   #navigation {
@@ -78,21 +76,19 @@
     top: 0;
     height: 3em;
     width: 100%;
-    overflow: hidden;
   }
-  
 }
 
 /**
  * Use 3 grid columns for smaller screens.
  */
-@media screen and (max-width: 800px) {
+@media all and (min-width: 480px) and (max-width: 959px) {
 
   /**
    * The layout when there is only one sidebar, the left one.
    */
 
-  /* Span 2 columns, starting in 2nd column from left. 
+  /* Span 2 columns, starting in 2nd column from left. */
   .sidebar-first #content {
     float: left;
     width: 66.66667%;
@@ -100,7 +96,7 @@
     margin-right: -100%;
   }
 
-  /* Span 1 column, starting in 1st column from left. 
+  /* Span 1 column, starting in 1st column from left. */
   .sidebar-first .region-sidebar-first {
     float: left;
     width: 33.33333%;
@@ -112,7 +108,7 @@
    * The layout when there is only one sidebar, the right one.
    */
 
-  /* Span 2 columns, starting in 1st column from left. 
+  /* Span 2 columns, starting in 1st column from left. */
   .sidebar-second #content {
     float: left;
     width: 66.66667%;
@@ -120,7 +116,7 @@
     margin-right: -66.66667%;
   }
 
-  /* Span 1 column, starting in 3rd column from left. 
+  /* Span 1 column, starting in 3rd column from left. */
   .sidebar-second .region-sidebar-second {
     float: left;
     width: 33.33333%;
@@ -161,8 +157,8 @@
 
   /* Apply the shared properties of grid items in a single, efficient ruleset. */
   .two-sidebars .region-sidebar-second .block {
-    padding-left: 5px;
-    padding-right: 5px;
+    padding-left: 10px;
+    padding-right: 10px;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
     -ms-box-sizing: border-box;
@@ -203,7 +199,7 @@
 /**
  * Use 5 grid columns for larger screens.
  */
-@media all and (min-width: 800px) {
+@media all and (min-width: 960px) {
 
   /**
    * The layout when there is only one sidebar, the left one.
@@ -267,9 +263,7 @@
 
   /* Span 1 column, starting in 5th column from left. */
   .two-sidebars .region-sidebar-second {
-/*
     float: left;
-*/
     width: 20%;
     margin-left: 80%;
     margin-right: -100%;

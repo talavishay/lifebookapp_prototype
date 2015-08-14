@@ -271,7 +271,8 @@ function _get_fabric_canvas_view_field($entity, $field, $delta, $item, $display)
 			),
 			'js' => array(
 				drupal_get_path('module', 'fabric_canvas_view'). '/js/fabric_canvas_view.js',
-				drupal_get_path('module', 'fabric_canvas_view'). '/js/fabric.js',
+				drupal_get_path('module', 'fabric_canvas_view'). '/js/fabric.min.js',
+				//drupal_get_path('module', 'fabric_canvas_view'). '/js/fabric.js',
 				drupal_get_path('module', 'fabric_canvas_view_field').'/js/fabric_canvas_view_field.js',
 				_get_js_data($_entity_id, $delta, $_data, $display)
 			)
